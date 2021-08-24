@@ -42,6 +42,8 @@ namespace OpenTKCalculator
             this.glControl1.Size = new System.Drawing.Size(699, 568);
             this.glControl1.TabIndex = 0;
             this.glControl1.VSync = true;
+            this.glControl1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.glControl1_MouseDown);
+            this.glControl1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.glControl1_MouseUp);
             // 
             // Form1
             // 

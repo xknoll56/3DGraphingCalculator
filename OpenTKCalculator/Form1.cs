@@ -35,8 +35,11 @@ namespace OpenTKCalculator
         Shader shader;
         private int ElementBufferObject;
         KeyboardState input;
+        MouseState mouseInput;
         Camera mainCamera;
         bool[] keys = new bool[132];
+        bool[] mouse = new bool[3];
+        int[] prevMousePos = new int[2];
         long time;
         Stopwatch stopwatch;
 
@@ -49,6 +52,7 @@ namespace OpenTKCalculator
         {
             base.OnLoad(e);
 
+           //glControl1.MouseDown += GlControl1_MouseDown;
 
             // You can bind the events here or in the Designer.
             glControl1.Resize += MyGLControl_Resize;
@@ -133,6 +137,11 @@ namespace OpenTKCalculator
             stopwatch.Start();
         }
 
+        private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
@@ -169,14 +178,15 @@ namespace OpenTKCalculator
             float dt = stopwatch.ElapsedMilliseconds / 1000.0f;
             stopwatch.Restart();
             //stopwatch.Start();
+            mouseInput = Mouse.GetState();
 
             if (keys[(int)Keys.A])
             {
-                mainCamera.Yaw -= dt*45.0f;
+                mainCamera.Position -= mainCamera.Right * dt * 10.0f;
             }
             if (keys[(int)Keys.D])
             {
-                mainCamera.Yaw += dt*45.0f;
+                mainCamera.Position += mainCamera.Right * dt * 10.0f;
             }
             if (keys[(int)Keys.W])
             {
@@ -185,6 +195,16 @@ namespace OpenTKCalculator
             if (keys[(int)Keys.S])
             {
                 mainCamera.Position -= mainCamera.Front * dt*10.0f;
+            }
+            if(mouse[0])
+            {
+                float dx = (mouseInput.X - prevMousePos[0]);
+                float dy = (mouseInput.Y - prevMousePos[1]);
+                mainCamera.Yaw += dx * dt*5.0f;
+                mainCamera.Pitch -= dy * dt*5.0f;
+                prevMousePos[0] = mouseInput.X;
+                prevMousePos[1] = mouseInput.Y;
+
             }
             shader.SetMatrix4("view", mainCamera.GetViewMatrix());
             shader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
@@ -205,6 +225,7 @@ namespace OpenTKCalculator
         protected override void OnKeyDown(KeyEventArgs e)
         {
             input = Keyboard.GetState();
+           
 
             if (input.IsKeyDown(Key.Escape))
             {
@@ -223,6 +244,29 @@ namespace OpenTKCalculator
             base.OnKeyUp(e);
         }
 
+        private void glControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            mouseInput = Mouse.GetState();
+            if (e.Button == MouseButtons.Left)
+            {
+                mouse[0] = true;
+                prevMousePos[0] = mouseInput.X;
+                prevMousePos[1] = mouseInput.Y;
+            }
+            if (e.Button == MouseButtons.Right)
+                mouse[1] = true;
+            if (e.Button == MouseButtons.Middle)
+                mouse[2] = true;
+        }
 
+        private void glControl1_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                mouse[0] = false;
+            if (e.Button == MouseButtons.Right)
+                mouse[1] = false;
+            if (e.Button == MouseButtons.Middle)
+                mouse[2] = false;
+        }
     }
 }
