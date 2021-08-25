@@ -26,10 +26,10 @@ namespace OpenTKCalculator
         public int ElementBufferObject { get; }
 
         private List<Texture> textures;
-        MeshType meshType;
         public int shaderType { get; }
         public bool indexed { get; }
-
+        public int numVerts { get; }
+        MeshType meshType;
         public RenderType renderType = RenderType.TRIANGLES;
 
         public Mesh(float[] vertices, MeshType meshType)
@@ -86,6 +86,11 @@ namespace OpenTKCalculator
             this.meshType = meshType;
             shaderType = typeNum;
             indexed = false;
+
+            if (renderType == RenderType.LINES)
+                numVerts = vertices.Length / 2;
+            else if (renderType == RenderType.TRIANGLES)
+                numVerts = vertices.Length / 3;
         }
 
         public Mesh(float[] vertices, uint[] indices, MeshType meshType)
@@ -147,6 +152,11 @@ namespace OpenTKCalculator
             this.meshType = meshType;
             shaderType = typeNum;
             indexed = true;
+
+            if (renderType == RenderType.LINES)
+                numVerts = indices.Length / 2;
+            else if (renderType == RenderType.TRIANGLES)
+                numVerts = indices.Length / 3;
         }
 
         public void OnDelete()

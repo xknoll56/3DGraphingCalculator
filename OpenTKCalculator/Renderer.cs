@@ -19,6 +19,7 @@ namespace OpenTKCalculator
         private Shader shader;
         private Camera mainCamera;
         private List<Mesh> meshes;
+        private List<Entity> entities;
         public bool Initialize(GLControl gLControl)
         {
             this.glControl = gLControl;
@@ -38,9 +39,9 @@ namespace OpenTKCalculator
             String version = GL.GetString(StringName.ShadingLanguageVersion);
             Console.WriteLine(version);
             Console.WriteLine(GL.GetString(StringName.Vendor));
-            
 
- 
+
+
 
             //Initialize the shader
             shader = new Shader("shader.vert", "shader.frag");
@@ -59,7 +60,8 @@ namespace OpenTKCalculator
             stopwatch = new Stopwatch();
             stopwatch.Start();
             meshes = new List<Mesh>();
-            shader.SetVec4("color", new Vector4(0, 0, 1, 1));
+            entities = new List<Entity>();
+            shader.SetVec4("color", new Vector4(1, 0, 0, 1));
 
             return true;
         }
@@ -131,14 +133,12 @@ namespace OpenTKCalculator
 
             foreach (Mesh mesh in meshes)
             {
+                shader.SetMatrix4("model", Matrix4.Identity);
                 if (mesh.renderType == RenderType.TRIANGLES)
                 {
                     if (mesh.indexed)
                     {
-                        Matrix4 rot = Matrix4.CreateRotationX((float)Math.PI / 2.0f);
-                       Matrix4 scale =  Matrix4.CreateScale(10.0f);
-                        Matrix4 trans = Matrix4.Mult(rot, scale);
-                        shader.SetMatrix4("model", trans);
+
                         shader.SetInt("type", mesh.shaderType);
                         mesh.GetTextures()[0].Use(TextureUnit.Texture0);
                         GL.BindVertexArray(mesh.VertexArrayObject);
@@ -154,11 +154,39 @@ namespace OpenTKCalculator
                 }
                 else if (mesh.renderType == RenderType.LINES)
                 {
-                    Matrix4 trans = Matrix4.CreateTranslation(0, 0.05f, 0);
-                    shader.SetMatrix4("model", trans);
                     shader.SetInt("type", mesh.shaderType);
                     GL.BindVertexArray(mesh.VertexArrayObject);
                     GL.DrawArrays(PrimitiveType.Lines, 0, mesh.vertices.Length / 2);
+                }
+            }
+
+
+            foreach (Entity entity in entities)
+            {
+                shader.SetMatrix4("model", entity.model);
+                if (entity.mesh.renderType == RenderType.TRIANGLES)
+                {
+                    if (entity.mesh.indexed)
+                    {
+
+                        shader.SetInt("type", entity.mesh.shaderType);
+                        entity.mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        GL.BindVertexArray(entity.mesh.VertexArrayObject);
+                        GL.DrawElements(PrimitiveType.Triangles, entity.mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+                    }
+                    else
+                    {
+                        shader.SetInt("type", entity.mesh.shaderType);
+                        entity.mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        GL.BindVertexArray(entity.mesh.VertexArrayObject);
+                        GL.DrawArrays(PrimitiveType.Triangles, 0, entity.mesh.vertices.Length / 3);
+                    }
+                }
+                else if (entity.mesh.renderType == RenderType.LINES)
+                {
+                    shader.SetInt("type", entity.mesh.shaderType);
+                    GL.BindVertexArray(entity.mesh.VertexArrayObject);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, entity.mesh.vertices.Length / 2);
                 }
             }
 
