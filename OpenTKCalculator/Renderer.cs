@@ -3,6 +3,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -24,14 +25,18 @@ namespace OpenTKCalculator
 
             // You can bind the events here or in the Designer.
             glControl.Resize += OnResize;
-            glControl.Paint += OnUpdate;
+            glControl.Paint += OnPaint;
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
-            // GL.FrontFace(FrontFaceDirection.Ccw);
-            GL.CullFace(CullFaceMode.Front);
+            GL.Enable(EnableCap.Blend);
+            GL.Enable(EnableCap.LineSmooth);
+            GL.LineWidth(2.5f);
+            //GL.Enable(EnableCap.CullFace);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             //GL.Hint(HintTarget.)
             Console.WriteLine(GL.GetString(StringName.Renderer));
-            String version = GL.GetString(StringName.Version);
+            String version = GL.GetString(StringName.ShadingLanguageVersion);
+            Console.WriteLine(version);
             Console.WriteLine(GL.GetString(StringName.Vendor));
             
 
@@ -43,9 +48,8 @@ namespace OpenTKCalculator
 
 
 
-            mainCamera = new Camera(new Vector3(0, 0, 5), glControl.AspectRatio);
+            mainCamera = new Camera(new Vector3(0, 2, 5), glControl.AspectRatio);
             mainCamera.Yaw = 10.0f;
-            Console.WriteLine(mainCamera.Yaw);
             //mainCamera.Yaw = 0.23f;
             Matrix4 model = Matrix4.Identity;
             shader.SetMatrix4("model", model);
@@ -55,6 +59,7 @@ namespace OpenTKCalculator
             stopwatch = new Stopwatch();
             stopwatch.Start();
             meshes = new List<Mesh>();
+            shader.SetVec4("color", new Vector4(0, 0, 1, 1));
 
             return true;
         }
@@ -80,7 +85,7 @@ namespace OpenTKCalculator
             */
         }
 
-        private void OnUpdate(object? sender, PaintEventArgs e)
+        private void OnPaint(object? sender, PaintEventArgs e)
         {
             //input = Keyboard.GetState();
             //stopwatch.Stop();
@@ -107,12 +112,12 @@ namespace OpenTKCalculator
             }
             if (Input.mouse[0])
             {
-                float dx = (Input.mouseInput.X - Input.prevMousePos[0]);
-                float dy = (Input.mouseInput.Y - Input.prevMousePos[1]);
+                float dx = (Input.mouseInput.X - Input.prevMousePos.X);
+                float dy = (Input.mouseInput.Y - Input.prevMousePos.Y);
                 mainCamera.Yaw += dx * dt * 5.0f;
                 mainCamera.Pitch -= dy * dt * 5.0f;
-                Input.prevMousePos[0] = Input.mouseInput.X;
-                Input.prevMousePos[1] = Input.mouseInput.Y;
+                Input.prevMousePos.X = Input.mouseInput.X;
+                Input.prevMousePos.Y = Input.mouseInput.Y;
 
             }
             shader.SetMatrix4("view", mainCamera.GetViewMatrix());
@@ -126,11 +131,35 @@ namespace OpenTKCalculator
 
             foreach (Mesh mesh in meshes)
             {
-                //Just bind the first texture for now
-                mesh.GetTextures()[0].Use(TextureUnit.Texture0);
-                GL.BindVertexArray(mesh.VertexArrayObject);
-                // GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-                GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+                if (mesh.renderType == RenderType.TRIANGLES)
+                {
+                    if (mesh.indexed)
+                    {
+                        Matrix4 rot = Matrix4.CreateRotationX((float)Math.PI / 2.0f);
+                       Matrix4 scale =  Matrix4.CreateScale(10.0f);
+                        Matrix4 trans = Matrix4.Mult(rot, scale);
+                        shader.SetMatrix4("model", trans);
+                        shader.SetInt("type", mesh.shaderType);
+                        mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        GL.BindVertexArray(mesh.VertexArrayObject);
+                        GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+                    }
+                    else
+                    {
+                        shader.SetInt("type", mesh.shaderType);
+                        mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        GL.BindVertexArray(mesh.VertexArrayObject);
+                        GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.vertices.Length / 3);
+                    }
+                }
+                else if (mesh.renderType == RenderType.LINES)
+                {
+                    Matrix4 trans = Matrix4.CreateTranslation(0, 0.05f, 0);
+                    shader.SetMatrix4("model", trans);
+                    shader.SetInt("type", mesh.shaderType);
+                    GL.BindVertexArray(mesh.VertexArrayObject);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.vertices.Length / 2);
+                }
             }
 
             glControl.SwapBuffers();    // Display the result.

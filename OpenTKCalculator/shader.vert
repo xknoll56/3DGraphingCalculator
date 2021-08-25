@@ -12,7 +12,7 @@ out vec2 texCoord;
 
 void main()
 {
-    //vertColor = aColor;
+    vertColor = aColor;
     texCoord = aTexCoord;
-    gl_Position = projection*model*view*vec4(aPosition, 1.0);
+    gl_Position = projection*view*model*vec4(aPosition, 1.0);
 }

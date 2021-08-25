@@ -120,7 +120,25 @@ namespace OpenTKCalculator
             GL.UniformMatrix4(uniformLocations[name], false, ref data);
         }
 
+        public void SetVec4(string name, Vector4 data)
+        {
+            GL.UseProgram(handle);
+            GL.Uniform4(uniformLocations[name], ref data);
+        }
+
+        public void SetVec3(string name, Vector3 data)
+        {
+            GL.UseProgram(handle);
+            GL.Uniform3(uniformLocations[name], ref data);
+        }
+
         public void SetFloat(string name, float data)
+        {
+            GL.UseProgram(handle);
+            GL.Uniform1(uniformLocations[name], data);
+        }
+
+        public void SetInt(string name, int data)
         {
             GL.UseProgram(handle);
             GL.Uniform1(uniformLocations[name], data);

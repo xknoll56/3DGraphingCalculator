@@ -23,9 +23,21 @@ namespace OpenTKCalculator
             -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,  // bottom left
             -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
             };
+        float[] colVertices = {
+             0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
+             0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top left
+            };
+        float[] texVertices = {
+             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,  // top right
+             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f   // top left
+            };
         uint[] indices = {  // note that we start from 0!
-            0, 1, 3,   // first triangle
-            1, 2, 3    // second triangle
+            0, 3, 1,   // first triangle
+            1, 3, 2    // second triangle
             };
         Renderer renderer;
 
@@ -41,10 +53,38 @@ namespace OpenTKCalculator
 
             renderer = new Renderer();
             renderer.Initialize(glControl1);
-            Mesh mesh = new Mesh(vertices, indices);
+            //Mesh mesh = new Mesh(vertices, indices, MeshType.COLORED | MeshType.TEXTURED);
+            //Mesh mesh = new Mesh(texVertices, indices, MeshType.TEXTURED);
+            Mesh mesh = new Mesh(colVertices, indices, MeshType.COLORED);
             Texture texture = Texture.LoadFromFile("texture.png");
             mesh.AddTexture(texture);
             renderer.AddMesh(mesh);
+
+            List<float> gridVerts = new List<float>();
+            int gridSize = 5;
+            for(int i = -gridSize; i<= gridSize; i++)
+            {
+                gridVerts.Add(i);
+                gridVerts.Add(0);
+                gridVerts.Add(-gridSize);
+
+                gridVerts.Add(i);
+                gridVerts.Add(0);
+                gridVerts.Add(gridSize);
+
+                gridVerts.Add(-gridSize);
+                gridVerts.Add(0);
+                gridVerts.Add(i);
+
+                gridVerts.Add(gridSize);
+                gridVerts.Add(0);
+                gridVerts.Add(i);
+            }
+
+            Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.NONE);
+            gridMesh.renderType = RenderType.LINES;
+            renderer.AddMesh(gridMesh);
+
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -89,8 +129,10 @@ namespace OpenTKCalculator
             if (e.Button == MouseButtons.Left)
             {
                 Input.mouse[0] = true;
-                Input.prevMousePos[0] = Input.mouseInput.X;
-                Input.prevMousePos[1] = Input.mouseInput.Y;
+                Input.prevMousePos.X = Input.mouseInput.X;
+                Input.prevMousePos.Y = Input.mouseInput.Y;
+                Cursor.Hide();
+                Input.initMousePos = Cursor.Position;
             }
             if (e.Button == MouseButtons.Right)
                 Input.mouse[1] = true;
@@ -101,7 +143,11 @@ namespace OpenTKCalculator
         private void glControl1_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
+            {
                 Input.mouse[0] = false;
+                Cursor.Show();
+                Cursor.Position = Input.initMousePos;
+            }
             if (e.Button == MouseButtons.Right)
                 Input.mouse[1] = false;
             if (e.Button == MouseButtons.Middle)
