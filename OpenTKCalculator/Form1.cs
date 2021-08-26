@@ -143,12 +143,6 @@ namespace OpenTKCalculator
             renderer = new Renderer();
             renderer.Initialize(glControl1);
 
-            Mesh cubeMesh = new Mesh(cubeVerticesNoTexture, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw);
-            Entity entity = new Entity(cubeMesh, new Vector3(3, 1, 0), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
-            Texture texture = Texture.LoadFromFile("texture.png");
-            entity.mesh.texture = texture;
-            renderer.AddEntity(entity);
-
 
             List<float> gridVerts = new List<float>();
             int gridSize = 5;
@@ -175,66 +169,7 @@ namespace OpenTKCalculator
             gridMesh.color = new Vector3(1, 0, 0);
             renderer.AddMesh(gridMesh);
 
-            List<float> planeVerts = new List<float>();
-            List<uint> planeIndices = new List<uint>();
-            float xStart = -5, xEnd = 5;
-            float zStart = -5, zEnd = 5;
-            uint divisions = 100;
-            uint rows = 0, cols = 0;
-            bool rowsSet = false;
-            float dp = Math.Abs(xEnd - xStart) / divisions;
-            float x = xStart, z = zStart;
-            while(x < xEnd)
-            {
-                while(z < zEnd)
-                {
-                    planeVerts.Add(x);
-                    planeVerts.Add(0.1f*x*z);
-                    planeVerts.Add(z);
-                    if(!rowsSet)
-                        rows++;
-                    z += dp;
-                }
-                planeVerts.Add(x);
-                planeVerts.Add(0.1f * x * zEnd);
-                planeVerts.Add(zEnd);
-                if(!rowsSet)
-                    rows++;
-                rowsSet = true;
-                z = zStart;
-                x += dp;
-                cols++;
-            }
-            while (z < zEnd)
-            {
-                planeVerts.Add(xEnd);
-                planeVerts.Add(0.1f * xEnd * z);
-                planeVerts.Add(z);
-                z += dp;
-            }
-            planeVerts.Add(xEnd);
-            planeVerts.Add(0.1f * xEnd * zEnd);
-            planeVerts.Add(zEnd);
-            cols++;
-
-            for (uint row = 0; row<rows-1; row++)
-            {
-                for(uint col = 0; col<cols-1; col++)
-                {
-                    uint ind = row * cols + col;
-                    uint nextLineInd = row * cols + col + rows;
-
-                    planeIndices.Add(ind);
-                    planeIndices.Add(ind+1);
-                    planeIndices.Add(nextLineInd+1);
-
-                    planeIndices.Add(ind);
-                    planeIndices.Add(nextLineInd + 1);
-                    planeIndices.Add(nextLineInd);
-                }
-            }
-
-            Mesh dynMesh = new Mesh(planeVerts.ToArray(), planeIndices.ToArray(), MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
+            CalculationMesh dynMesh = CalculationMesh.GenerateCalculationMesh(-3.75f, 4.24f, -2.25f, 4.65f);
             renderer.AddMesh(dynMesh);
         }
 

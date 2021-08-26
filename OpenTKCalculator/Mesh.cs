@@ -32,9 +32,16 @@ namespace OpenTKCalculator
         public bool indexed { get; }
         public int numVerts { get; }
         public MeshType meshType { get; }
-        public RenderType renderType;
+        public RenderType renderType { get; }
+        public BufferUsageHint bufferUsageHint { get; }
         public Vector3 color { get; set; }
 
+        public bool calculateNormals { get; }
+
+        public Mesh()
+        {
+
+        }
         public Mesh(float[] vertices, MeshType meshType, RenderType renderType, BufferUsageHint bufferUsageHint)
         {
             this.vertices = vertices;
@@ -93,6 +100,7 @@ namespace OpenTKCalculator
 
             this.meshType = meshType;
             this.renderType = renderType;
+            this.bufferUsageHint = bufferUsageHint;
             shaderType = typeNum;
             indexed = false;
 
@@ -170,7 +178,7 @@ namespace OpenTKCalculator
 
                             Vector3 normal = Vector3.Cross(v2 - v1, v3 - v1);
                             normal.Normalize();
-                            normals[index1*3] = normal.X;
+                            normals[index1 * 3] = normal.X;
                             normals[index1 * 3 + 1] = normal.Y;
                             normals[index1 * 3 + 2] = normal.Z;
                             normals[index2 * 3] = normal.X;
@@ -204,6 +212,8 @@ namespace OpenTKCalculator
 
             this.meshType = meshType;
             this.renderType = renderType;
+            this.bufferUsageHint = bufferUsageHint;
+            this.calculateNormals = calculateNormals;
             shaderType = typeNum;
             indexed = true;
 
@@ -213,6 +223,11 @@ namespace OpenTKCalculator
                 numVerts = indices.Length / 3;
 
             color = new Vector3(1, 1, 1);
+        }
+
+        public Mesh(Mesh mesh): this(mesh.vertices, mesh.indices, mesh.meshType, mesh.renderType, mesh.bufferUsageHint, mesh.calculateNormals)
+        {
+
         }
 
         public void OnDelete()
