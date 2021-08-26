@@ -10,7 +10,7 @@ namespace OpenTKCalculator
     {
         public static KeyboardState keyboardInput;
         public static MouseState mouseInput;
-        public static bool[] keys = new bool[132];
+        public static bool[] keys = new bool[256];
         public static bool[] mouse = new bool[3];
         //The mouse position on the previous update
         public static Point prevMousePos = new Point(0,0);

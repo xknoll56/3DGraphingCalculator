@@ -42,14 +42,9 @@ namespace OpenTKCalculator
             Console.WriteLine(version);
             Console.WriteLine(GL.GetString(StringName.Vendor));
 
-
-
-
             //Initialize the shader
             shader = new Shader("Shaders/ModelShader.vert", "Shaders/ModelShader.frag");
             gridShader = new Shader("Shaders/GridShader.vert", "Shaders/GridShader.frag");
-
-
 
             mainCamera = new Camera(new Vector3(0, 2, 5), glControl.AspectRatio);
             mainCamera.Yaw = 10.0f;

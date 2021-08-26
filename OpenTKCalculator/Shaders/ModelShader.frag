@@ -20,7 +20,7 @@ void main()
     if(type == 3)
         FragColor = texture(texture0, texCoord)*vec4(color, 1.0);
     else if(type == 1)
-        FragColor = texture(texture0, texCoord);
+        FragColor = vec4(vec3(texture(texture0, texCoord))*diffuse, 1.0);
     else if(type == 2)
         FragColor = vec4(color*diffuse, 1.0);
 }
