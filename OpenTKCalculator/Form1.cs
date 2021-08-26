@@ -18,10 +18,10 @@ namespace OpenTKCalculator
     public partial class Form1 : Form
     {
         float[] vertices = {
-             0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // top right
-             0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,  // bottom left
-            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
+             0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
+             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f   // top left
             };
         float[] colVertices = {
              0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
@@ -41,47 +41,47 @@ namespace OpenTKCalculator
             };
 
         float[] cubeVertices = {
-            -0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+             0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
 
-            -0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+             0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+             0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f, -1.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,-1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,-1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,-1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,-1.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,-1.0f, 0.0f, 0.0f,
 
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
+             0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,
 
-            -0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+             0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
 
-            -0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f, -0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f
+            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
             };
         Renderer renderer;
 
@@ -97,12 +97,14 @@ namespace OpenTKCalculator
 
             renderer = new Renderer();
             renderer.Initialize(glControl1);
-            //Mesh mesh = new Mesh(vertices, indices, MeshType.COLORED | MeshType.TEXTURED);
-            //Mesh mesh = new Mesh(texVertices, indices, MeshType.TEXTURED);
-            Mesh mesh = new Mesh(colVertices, indices, MeshType.COLORED);
+
+            Mesh cubeMesh = new Mesh(cubeVertices, MeshType.COLORED, RenderType.TRIANGLES);
+            Entity entity = new Entity(cubeMesh, new Vector3(3, 1, 0), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
             Texture texture = Texture.LoadFromFile("texture.png");
-            mesh.AddTexture(texture);
-            renderer.AddMesh(mesh);
+            //mesh.texture = texture;
+            //renderer.AddMesh(mesh);
+           // renderer.AddMesh(cubeMesh);
+            renderer.AddEntity(entity);
 
             List<float> gridVerts = new List<float>();
             int gridSize = 5;
@@ -125,8 +127,9 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.NONE);
+            Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.POINTS);
             gridMesh.renderType = RenderType.LINES;
+            gridMesh.color = new Vector4(1, 0, 0, 0.75f);
             renderer.AddMesh(gridMesh);
 
 

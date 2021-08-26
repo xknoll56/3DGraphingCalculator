@@ -7,10 +7,47 @@ namespace OpenTKCalculator
 {
     class Entity
     {
-        public Vector3 position { get; set; }
-        public Vector3 scale { get; set; }
-        public Quaternion rotation { get; set; }
-        public Matrix4 model { get; set; }
+        private Vector3 position;
+        public Vector3 Position 
+        {
+            get
+            {
+                return position;
+            }
+            set
+            {
+                position = value;
+                UpdateModel();
+            }
+        }
+        private Vector3 scale;
+        public Vector3 Scale
+        {
+            get
+            {
+                return scale;
+            }
+            set
+            {
+                scale = value;
+                UpdateModel();
+            }
+        }
+        private Quaternion rotation;
+        public Quaternion Rotation
+        {
+            get
+            {
+                return rotation;
+            }
+            set
+            {
+                rotation = value;
+                UpdateModel();
+            }
+        }
+        public Vector4 color { get; set; }
+        public Matrix4 model { get; private set; }
         private Matrix4 translationMatrix;
         private Matrix4 scaleMatrix;
         private Matrix4 rotationMatrix;
@@ -22,10 +59,7 @@ namespace OpenTKCalculator
             this.position = position;
             this.scale = scale;
             this.rotation = rotation;
-            translationMatrix = Matrix4.CreateTranslation(position);
-            scaleMatrix = Matrix4.CreateScale(scale);
-            rotationMatrix = Matrix4.CreateFromQuaternion(rotation);
-            model = translationMatrix * rotationMatrix * scaleMatrix;
+            UpdateModel();
         }
 
         public Entity(Mesh mesh, Vector3 position, Vector3 scale, Quaternion rotation)
@@ -34,10 +68,7 @@ namespace OpenTKCalculator
             this.position = position;
             this.scale = scale;
             this.rotation = rotation;
-            translationMatrix = Matrix4.CreateTranslation(position);
-            scaleMatrix = Matrix4.CreateScale(scale);
-            rotationMatrix = Matrix4.CreateFromQuaternion(rotation);
-            model = translationMatrix * rotationMatrix * scaleMatrix;
+            UpdateModel();
         }
 
         public void UpdateModel()
@@ -45,7 +76,7 @@ namespace OpenTKCalculator
             translationMatrix = Matrix4.CreateTranslation(position);
             scaleMatrix = Matrix4.CreateScale(scale);
             rotationMatrix = Matrix4.CreateFromQuaternion(rotation);
-            model = translationMatrix * rotationMatrix * scaleMatrix;
+            model = scaleMatrix*rotationMatrix*translationMatrix;
         }
 
     }

@@ -20,6 +20,7 @@ namespace OpenTKCalculator
         private Camera mainCamera;
         private List<Mesh> meshes;
         private List<Entity> entities;
+        Vector3 rotationTest = new Vector3();
         public bool Initialize(GLControl gLControl)
         {
             this.glControl = gLControl;
@@ -134,20 +135,23 @@ namespace OpenTKCalculator
             foreach (Mesh mesh in meshes)
             {
                 shader.SetMatrix4("model", Matrix4.Identity);
+                shader.SetVec4("color", mesh.color);                
                 if (mesh.renderType == RenderType.TRIANGLES)
                 {
                     if (mesh.indexed)
                     {
 
                         shader.SetInt("type", mesh.shaderType);
-                        mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        if (mesh.meshType == MeshType.TEXTURED)
+                            mesh.texture.Use(TextureUnit.Texture0);
                         GL.BindVertexArray(mesh.VertexArrayObject);
                         GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
                     }
                     else
                     {
                         shader.SetInt("type", mesh.shaderType);
-                        mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        if (mesh.meshType == MeshType.TEXTURED)
+                            mesh.texture.Use(TextureUnit.Texture0);
                         GL.BindVertexArray(mesh.VertexArrayObject);
                         GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.vertices.Length / 3);
                     }
@@ -164,20 +168,26 @@ namespace OpenTKCalculator
             foreach (Entity entity in entities)
             {
                 shader.SetMatrix4("model", entity.model);
+                shader.SetVec4("color", entity.mesh.color);
+                rotationTest.Y += dt;
+                rotationTest.X += dt * 2;
+                entity.Rotation = Quaternion.FromEulerAngles(rotationTest);
                 if (entity.mesh.renderType == RenderType.TRIANGLES)
                 {
                     if (entity.mesh.indexed)
                     {
 
                         shader.SetInt("type", entity.mesh.shaderType);
-                        entity.mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        if(entity.mesh.meshType == MeshType.TEXTURED)
+                            entity.mesh.texture.Use(TextureUnit.Texture0);
                         GL.BindVertexArray(entity.mesh.VertexArrayObject);
                         GL.DrawElements(PrimitiveType.Triangles, entity.mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
                     }
                     else
                     {
                         shader.SetInt("type", entity.mesh.shaderType);
-                        entity.mesh.GetTextures()[0].Use(TextureUnit.Texture0);
+                        if (entity.mesh.meshType == MeshType.TEXTURED)
+                            entity.mesh.texture.Use(TextureUnit.Texture0);
                         GL.BindVertexArray(entity.mesh.VertexArrayObject);
                         GL.DrawArrays(PrimitiveType.Triangles, 0, entity.mesh.vertices.Length / 3);
                     }
@@ -197,6 +207,11 @@ namespace OpenTKCalculator
         public void AddMesh(Mesh mesh)
         {
             meshes.Add(mesh);
+        }
+
+        public void AddEntity(Entity entity)
+        {
+            entities.Add(entity);
         }
 
         public void OnQuit()
