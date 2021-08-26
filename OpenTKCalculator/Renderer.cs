@@ -17,6 +17,7 @@ namespace OpenTKCalculator
         private GLControl glControl;
         private Stopwatch stopwatch;
         private Shader shader;
+        private Shader gridShader;
         private Camera mainCamera;
         private List<Mesh> meshes;
         private List<Entity> entities;
@@ -45,8 +46,8 @@ namespace OpenTKCalculator
 
 
             //Initialize the shader
-            shader = new Shader("shader.vert", "shader.frag");
-            shader.Use();
+            shader = new Shader("Shaders/ModelShader.vert", "Shaders/ModelShader.frag");
+            gridShader = new Shader("Shaders/GridShader.vert", "Shaders/GridShader.frag");
 
 
 
@@ -57,12 +58,12 @@ namespace OpenTKCalculator
             shader.SetMatrix4("model", model);
             shader.SetMatrix4("view", mainCamera.GetViewMatrix());
             shader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
+            gridShader.SetMatrix4("model", Matrix4.Identity);
 
             stopwatch = new Stopwatch();
             stopwatch.Start();
             meshes = new List<Mesh>();
             entities = new List<Entity>();
-            shader.SetVec4("color", new Vector4(1, 0, 0, 1));
 
             return true;
         }
@@ -125,19 +126,20 @@ namespace OpenTKCalculator
             }
             shader.SetMatrix4("view", mainCamera.GetViewMatrix());
             shader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
+            gridShader.SetMatrix4("view", mainCamera.GetViewMatrix());
+            gridShader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
             IGraphicsContext graphicsContext = GraphicsContext.CurrentContext;
             if (graphicsContext == null || !graphicsContext.IsCurrent)
                 glControl.MakeCurrent();    // Tell OpenGL to draw on MyGLControl.
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            shader.Use();
-
             foreach (Mesh mesh in meshes)
             {
                 shader.SetMatrix4("model", Matrix4.Identity);
-                shader.SetVec4("color", mesh.color);                
+                shader.SetVec3("color", mesh.color);                
                 if (mesh.renderType == RenderType.TRIANGLES)
                 {
+                    shader.Use();
                     if (mesh.indexed)
                     {
 
@@ -153,14 +155,16 @@ namespace OpenTKCalculator
                         if (mesh.meshType == MeshType.TEXTURED)
                             mesh.texture.Use(TextureUnit.Texture0);
                         GL.BindVertexArray(mesh.VertexArrayObject);
-                        GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.vertices.Length / 3);
+                        GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.numVerts);
                     }
                 }
                 else if (mesh.renderType == RenderType.LINES)
                 {
-                    shader.SetInt("type", mesh.shaderType);
+                    //gridShader.Use();
+                    gridShader.SetVec3("color", mesh.color);
+                    GL.UseProgram(gridShader.GetHandle());
                     GL.BindVertexArray(mesh.VertexArrayObject);
-                    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.vertices.Length / 2);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
                 }
             }
 
@@ -168,12 +172,13 @@ namespace OpenTKCalculator
             foreach (Entity entity in entities)
             {
                 shader.SetMatrix4("model", entity.model);
-                shader.SetVec4("color", entity.mesh.color);
+                shader.SetVec3("color", entity.mesh.color);
                 rotationTest.Y += dt;
                 rotationTest.X += dt * 2;
                 entity.Rotation = Quaternion.FromEulerAngles(rotationTest);
                 if (entity.mesh.renderType == RenderType.TRIANGLES)
                 {
+                    shader.Use();
                     if (entity.mesh.indexed)
                     {
 
@@ -189,14 +194,16 @@ namespace OpenTKCalculator
                         if (entity.mesh.meshType == MeshType.TEXTURED)
                             entity.mesh.texture.Use(TextureUnit.Texture0);
                         GL.BindVertexArray(entity.mesh.VertexArrayObject);
-                        GL.DrawArrays(PrimitiveType.Triangles, 0, entity.mesh.vertices.Length / 3);
+                        GL.DrawArrays(PrimitiveType.Triangles, 0, entity.mesh.numVerts);
                     }
                 }
                 else if (entity.mesh.renderType == RenderType.LINES)
                 {
+                    shader.Use();
+                    shader.SetVec3("color", entity.mesh.color);
                     shader.SetInt("type", entity.mesh.shaderType);
                     GL.BindVertexArray(entity.mesh.VertexArrayObject);
-                    GL.DrawArrays(PrimitiveType.Lines, 0, entity.mesh.vertices.Length / 2);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, entity.mesh.numVerts);
                 }
             }
 

@@ -31,7 +31,7 @@ namespace OpenTKCalculator
         public int numVerts { get; }
         public MeshType meshType { get; }
         public RenderType renderType;
-        public Vector4 color { get; set; }
+        public Vector3 color { get; set; }
 
         public Mesh(float[] vertices, MeshType meshType, RenderType renderType)
         {
@@ -71,8 +71,8 @@ namespace OpenTKCalculator
                     GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
                     GL.EnableVertexAttribArray(0);
 
-                    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
-                    GL.EnableVertexAttribArray(1);
+                    GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
+                    GL.EnableVertexAttribArray(2);
 
                     if ((typeNum & (int)MeshType.TEXTURED) != 0)
                     {
@@ -80,7 +80,7 @@ namespace OpenTKCalculator
                         GL.EnableVertexAttribArray(1);
                     }
                     break;
-                case RenderType.POINTS:
+                case RenderType.LINES:
                     stride = 3;
                     textureOffset = 0;
                     normalOffset = 0;
@@ -99,7 +99,7 @@ namespace OpenTKCalculator
             else if (renderType == RenderType.TRIANGLES)
                 numVerts = vertices.Length / 3;
 
-            color = new Vector4(1, 1, 1, 1);
+            color = new Vector3(1, 1, 1);
             
         }
 
@@ -141,8 +141,8 @@ namespace OpenTKCalculator
                     GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
                     GL.EnableVertexAttribArray(0);
 
-                    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
-                    GL.EnableVertexAttribArray(1);
+                    GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
+                    GL.EnableVertexAttribArray(2);
 
                     if ((typeNum & (int)MeshType.TEXTURED) != 0)
                     {
@@ -150,7 +150,7 @@ namespace OpenTKCalculator
                         GL.EnableVertexAttribArray(1);
                     }
                     break;
-                case RenderType.POINTS:
+                case RenderType.LINES:
                     stride = 3;
                     textureOffset = 0;
                     normalOffset = 0;
@@ -173,7 +173,7 @@ namespace OpenTKCalculator
             else if (renderType == RenderType.TRIANGLES)
                 numVerts = indices.Length / 3;
 
-            color = new Vector4(1, 1, 1, 1);
+            color = new Vector3(1, 1, 1);
         }
 
         public void OnDelete()

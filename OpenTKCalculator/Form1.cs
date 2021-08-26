@@ -127,12 +127,9 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.POINTS);
-            gridMesh.renderType = RenderType.LINES;
-            gridMesh.color = new Vector4(1, 0, 0, 0.75f);
+            Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES);
+            gridMesh.color = new Vector3(1, 0, 0);
             renderer.AddMesh(gridMesh);
-
-
 
         }
 
@@ -147,9 +144,6 @@ namespace OpenTKCalculator
             renderer.OnQuit();
         }
         
-
-
-
         protected override void OnKeyDown(KeyEventArgs e)
         {
             Input.keyboardInput = Keyboard.GetState();
