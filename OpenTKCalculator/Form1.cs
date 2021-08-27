@@ -19,6 +19,7 @@ namespace OpenTKCalculator
     {
 
         Renderer renderer;
+        Tokenizer tokenizer;
 
         public Form1()
         {
@@ -31,6 +32,7 @@ namespace OpenTKCalculator
             base.OnLoad(e);
 
             renderer = new Renderer();
+            tokenizer = new Tokenizer();
             renderer.Initialize(glControl1);
 
 
@@ -60,6 +62,11 @@ namespace OpenTKCalculator
             renderer.AddMesh(gridMesh);
 
             CalculationMesh dynMesh = CalculationMesh.GenerateCalculationMesh(-3.75f, 4.24f, -2.25f, 4.65f);
+            //renderer.AddMesh(dynMesh);
+            Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
+            dynMeshEntity.mesh = dynMesh;
+            dynMesh.color = new Vector3(0, 1, 1);
+            // renderer.AddEntity(dynMeshEntity);
             renderer.AddMesh(dynMesh);
         }
 
@@ -127,6 +134,14 @@ namespace OpenTKCalculator
                 Input.mouse[1] = false;
             if (e.Button == MouseButtons.Middle)
                 Input.mouse[2] = false;
+        }
+
+        private void expressionTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                tokenizer.TokenizeExpression(expressionTextBox.Text);
+            }
         }
     }
 }
