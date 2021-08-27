@@ -17,116 +17,6 @@ namespace OpenTKCalculator
 {
     public partial class Form1 : Form
     {
-        float[] vertices = {
-             0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
-             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
-            -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f   // top left
-            };
-        float[] colVertices = {
-             0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
-             0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // bottom left
-            -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top left
-            };
-        float[] texVertices = {
-             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,  // top right
-             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
-            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f   // top left
-            };
-        uint[] indices = {  // note that we start from 0!
-            0, 3, 1,   // first triangle
-            1, 3, 2    // second triangle
-            };
-
-        float[] cubeVertices = {
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,-1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,-1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,-1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,-1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-             0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-            };
-
-        float[] cubeVerticesNoTexture = {
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 
-             0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 
-             0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 
-             0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 
-            -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 
-
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 
-             0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 
-             0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 
-             0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 
-            -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 
-            -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 
-
-            -0.5f,  0.5f,  0.5f, -1.0f, 0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,-1.0f, 0.0f, 0.0f, 
-            -0.5f, -0.5f, -0.5f,-1.0f, 0.0f, 0.0f, 
-            -0.5f, -0.5f, -0.5f,-1.0f, 0.0f, 0.0f, 
-            -0.5f, -0.5f,  0.5f,-1.0f, 0.0f, 0.0f, 
-            -0.5f,  0.5f,  0.5f,-1.0f, 0.0f, 0.0f, 
-
-             0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 
-             0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 
-             0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 
-             0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 
-             0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 
-             0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 
-
-            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 
-             0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 
-             0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f, 
-             0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f, 
-            -0.5f, -0.5f,  0.5f, 0.0f, -1.0f, 0.0f, 
-            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 
-
-            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            };
 
         Renderer renderer;
 
@@ -216,6 +106,7 @@ namespace OpenTKCalculator
                 Input.prevMousePos.Y = Input.mouseInput.Y;
                 Cursor.Hide();
                 Input.initMousePos = Cursor.Position;
+                renderer.canControl = true;
             }
             if (e.Button == MouseButtons.Right)
                 Input.mouse[1] = true;
@@ -230,6 +121,7 @@ namespace OpenTKCalculator
                 Input.mouse[0] = false;
                 Cursor.Show();
                 Cursor.Position = Input.initMousePos;
+                renderer.canControl = false;
             }
             if (e.Button == MouseButtons.Right)
                 Input.mouse[1] = false;

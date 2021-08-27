@@ -22,6 +22,7 @@ namespace OpenTKCalculator
         private List<Mesh> meshes;
         private List<Entity> entities;
         Vector3 rotationTest = new Vector3();
+        public bool canControl { get; set; }
         public bool Initialize(GLControl gLControl)
         {
             this.glControl = gLControl;
@@ -59,6 +60,7 @@ namespace OpenTKCalculator
             stopwatch.Start();
             meshes = new List<Mesh>();
             entities = new List<Entity>();
+            canControl = false;
 
             return true;
         }
@@ -91,33 +93,36 @@ namespace OpenTKCalculator
             float dt = stopwatch.ElapsedMilliseconds / 1000.0f;
             stopwatch.Restart();
             //stopwatch.Start();
-            Input.mouseInput = Mouse.GetState();
+            if (canControl)
+            {
+                Input.mouseInput = Mouse.GetState();
 
-            if (Input.keys[(int)Keys.A])
-            {
-                mainCamera.Position -= mainCamera.Right * dt * 10.0f;
-            }
-            if (Input.keys[(int)Keys.D])
-            {
-                mainCamera.Position += mainCamera.Right * dt * 10.0f;
-            }
-            if (Input.keys[(int)Keys.W])
-            {
-                mainCamera.Position += mainCamera.Front * dt * 10.0f;
-            }
-            if (Input.keys[(int)Keys.S])
-            {
-                mainCamera.Position -= mainCamera.Front * dt * 10.0f;
-            }
-            if (Input.mouse[0])
-            {
-                float dx = (Input.mouseInput.X - Input.prevMousePos.X);
-                float dy = (Input.mouseInput.Y - Input.prevMousePos.Y);
-                mainCamera.Yaw += dx * dt * 5.0f;
-                mainCamera.Pitch -= dy * dt * 5.0f;
-                Input.prevMousePos.X = Input.mouseInput.X;
-                Input.prevMousePos.Y = Input.mouseInput.Y;
+                if (Input.keys[(int)Keys.A])
+                {
+                    mainCamera.Position -= mainCamera.Right * dt * 10.0f;
+                }
+                if (Input.keys[(int)Keys.D])
+                {
+                    mainCamera.Position += mainCamera.Right * dt * 10.0f;
+                }
+                if (Input.keys[(int)Keys.W])
+                {
+                    mainCamera.Position += mainCamera.Front * dt * 10.0f;
+                }
+                if (Input.keys[(int)Keys.S])
+                {
+                    mainCamera.Position -= mainCamera.Front * dt * 10.0f;
+                }
+                if (Input.mouse[0])
+                {
+                    float dx = (Input.mouseInput.X - Input.prevMousePos.X);
+                    float dy = (Input.mouseInput.Y - Input.prevMousePos.Y);
+                    mainCamera.Yaw += dx * dt * 5.0f;
+                    mainCamera.Pitch -= dy * dt * 5.0f;
+                    Input.prevMousePos.X = Input.mouseInput.X;
+                    Input.prevMousePos.Y = Input.mouseInput.Y;
 
+                }
             }
             shader.SetMatrix4("view", mainCamera.GetViewMatrix());
             shader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
@@ -168,9 +173,6 @@ namespace OpenTKCalculator
             {
                 shader.SetMatrix4("model", entity.model);
                 shader.SetVec3("color", entity.mesh.color);
-                rotationTest.Y += dt;
-                rotationTest.X += dt * 2;
-                entity.Rotation = Quaternion.FromEulerAngles(rotationTest);
                 if (entity.mesh.renderType == RenderType.TRIANGLES)
                 {
                     shader.Use();

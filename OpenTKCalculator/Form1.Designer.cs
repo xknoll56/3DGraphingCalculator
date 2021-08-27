@@ -30,6 +30,7 @@ namespace OpenTKCalculator
         private void InitializeComponent()
         {
             this.glControl1 = new OpenTK.GLControl();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // glControl1
@@ -45,24 +46,34 @@ namespace OpenTKCalculator
             this.glControl1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.glControl1_MouseDown);
             this.glControl1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.glControl1_MouseUp);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(928, 13);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(340, 27);
+            this.textBox1.TabIndex = 1;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.ClientSize = new System.Drawing.Size(1280, 720);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.glControl1);
             this.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "3D Calculator";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private OpenTK.GLControl glControl1;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
