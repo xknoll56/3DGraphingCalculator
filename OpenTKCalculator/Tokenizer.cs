@@ -9,7 +9,8 @@ namespace OpenTKCalculator
         NUMBER = 0,
         OPERATOR,
         FUNCTION, 
-        VARIABLE
+        VARIABLE,
+        EOF
     }
     class Token
     {
@@ -17,6 +18,7 @@ namespace OpenTKCalculator
         private double num = double.NaN;
         private char op = ' ';
         private char var = ' ';
+        private char end = '\n';
         private String func = "";
 
         public Token(double num)
@@ -30,7 +32,11 @@ namespace OpenTKCalculator
             if (Char.ToUpper(c) == 'X' || Char.ToUpper(c) == 'Y')
             {
                 type = TokenType.VARIABLE;
-                this.var = c;
+                this.var = Char.ToUpper(c);
+            }
+            else if(c == '\n')
+            {
+                type = TokenType.EOF;
             }
             else
             {
@@ -57,6 +63,8 @@ namespace OpenTKCalculator
                     return op;
                 case TokenType.VARIABLE:
                     return var;
+                case TokenType.EOF:
+                    return end;
             }
 
             return null;
@@ -74,6 +82,8 @@ namespace OpenTKCalculator
                     return "Operator: "+op.ToString();
                 case TokenType.VARIABLE:
                     return "Variable: " + var.ToString();
+                case TokenType.EOF:
+                    return "EOF";
             }
             return "";
         }
@@ -81,7 +91,7 @@ namespace OpenTKCalculator
     class Tokenizer
     {
         public List<Token> tokens { get; }
-        private String operators = "+-*/()^";
+        private String operators = "+-*/()^÷x";
         private List<String> functions =
         new List<string>(){
             "Sin",
@@ -128,8 +138,13 @@ namespace OpenTKCalculator
                         }
                         else if (Char.IsLetter(c))
                         {
-                            token += c;
-                            reading = ReadingType.FUNCTION;
+                            if (Char.ToUpper(c) == 'X' || Char.ToUpper(c) == 'Y')
+                                tokens.Add(new Token(c));
+                            else
+                            {
+                                token += c;
+                                reading = ReadingType.FUNCTION;
+                            }
                         }
                         else if (operators.Contains(c))
                         {
@@ -144,19 +159,9 @@ namespace OpenTKCalculator
                             if(functions.Contains(token))
                                 tokens.Add(new Token(token));
                             token = "";
-                            if (Char.IsDigit(c))
-                            {
-                                token += c;
-                                reading = ReadingType.NUMBER;
-                            }
-                            else if (operators.Contains(c))
-                            {
-                                tokens.Add(new Token(c));
-                                reading = ReadingType.NONE;
-                            }
-                            else if (c == ' ')
-                                reading = ReadingType.NONE;
-
+                            i--;
+                            reading = ReadingType.NONE;
+                            continue;
                         }
                         else
                         {
@@ -176,18 +181,9 @@ namespace OpenTKCalculator
                                 Console.WriteLine("Failed");
                             }
                             token = "";
-                            if (Char.IsLetter(c))
-                            {
-                                token += c;
-                                reading = ReadingType.FUNCTION;
-                            }
-                            else if (operators.Contains(c))
-                            {
-                                tokens.Add(new Token(c));
-                                reading = ReadingType.NONE;
-                            }
-                            else if (c == ' ')
-                                reading = ReadingType.NONE;
+                            i--;
+                            reading = ReadingType.NONE;
+                            continue;
                         }
                         else
                         {
@@ -221,7 +217,10 @@ namespace OpenTKCalculator
                     break;
             }
 
+            tokens.Add(new Token('\n'));
+
         }
+
 
         public void PrintTokens()
         {

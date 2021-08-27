@@ -19,7 +19,8 @@ namespace OpenTKCalculator
     {
 
         Renderer renderer;
-        Tokenizer tokenizer;
+        //Tokenizer tokenizer;
+        Interpreter interpreter;
 
         public MainForm()
         {
@@ -32,7 +33,7 @@ namespace OpenTKCalculator
             base.OnLoad(e);
 
             renderer = new Renderer();
-            tokenizer = new Tokenizer();
+            interpreter = new Interpreter();
             renderer.Initialize(glControl1);
 
 
@@ -140,8 +141,10 @@ namespace OpenTKCalculator
         {
             if(e.KeyCode == Keys.Enter)
             {
-                tokenizer.TokenizeExpression(expressionTextBox.Text);
-                tokenizer.PrintTokens();
+                //tokenizer.TokenizeExpression(expressionTextBox.Text);
+                //tokenizer.PrintTokens();
+                double res = interpreter.EvaluateSimpleExpression(expressionTextBox.Text);
+                expressionTextBox.Text = res.ToString();
             }
         }
     }
