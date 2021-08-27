@@ -15,13 +15,13 @@ using OpenTK.Graphics;
 
 namespace OpenTKCalculator
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
 
         Renderer renderer;
         Tokenizer tokenizer;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -141,6 +141,7 @@ namespace OpenTKCalculator
             if(e.KeyCode == Keys.Enter)
             {
                 tokenizer.TokenizeExpression(expressionTextBox.Text);
+                tokenizer.PrintTokens();
             }
         }
     }

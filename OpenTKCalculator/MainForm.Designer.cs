@@ -1,7 +1,7 @@
 ﻿
 namespace OpenTKCalculator
 {
-    partial class Form1
+    partial class MainForm
     {
         //this.glControl1 = new OpenTK.GLControl(OpenTK.Graphics.GraphicsMode.Default, 4, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
         /// <summary>
