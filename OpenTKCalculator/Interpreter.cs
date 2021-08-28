@@ -8,6 +8,7 @@ namespace OpenTKCalculator
     {
         private Tokenizer tokenizer;
         private readonly Dictionary<char, int> operatorPrecidence;
+        private readonly Dictionary<string, int> functionArgs;
         Exception parseException = null;
         Token openBrack;
         Token closedBrack;
@@ -25,18 +26,33 @@ namespace OpenTKCalculator
             operatorPrecidence.Add('^', 2);
             operatorPrecidence.Add('(', 3);
             operatorPrecidence.Add(')', 3);
+            functionArgs = new Dictionary<string, int>();
+            functionArgs.Add("Sin", 1);
+            functionArgs.Add("Cos", 1);
+            functionArgs.Add("Tan", 1);
+            functionArgs.Add("Ln", 1);
+            functionArgs.Add("Log2", 1);
+            functionArgs.Add("Abs", 1);
+            functionArgs.Add("Min", 2);
+            functionArgs.Add("Max", 2);
             openBrack = new Token('(');
             closedBrack = new Token(')');
         }
 
         private bool FindOpenBrackets(Token tok)
         {
-            return tok.GetData<char>() == '(';
+            if (tok.type == TokenType.OPERATOR)
+                return tok.GetData<char>() == '(';
+            else
+                return false;
         }
 
         private bool FindClosedBrackets(Token tok)
         {
-            return tok.GetData<char>() == ')';
+            if (tok.type == TokenType.OPERATOR)
+                return tok.GetData<char>() == ')';
+            else
+                return false;
         }
 
         private void ReplaceAllVariables(List<Token> tokens, double x, double y)
@@ -65,7 +81,7 @@ namespace OpenTKCalculator
                 parseException = new Exception("Invalid bracketing");
                 return double.NaN;
             }
-            return EvaluateExpressionRecursive(tokens.ToArray(), 0, 0);
+            return EvaluateExpressionRecursive(tokens.ToArray());
 
         }
 
@@ -81,11 +97,11 @@ namespace OpenTKCalculator
                 parseException = new Exception("Invalid bracketing");
                 return double.NaN;
             }
-            return EvaluateExpressionRecursive(tokens.ToArray(), x, y);
+            return EvaluateExpressionRecursive(tokens.ToArray());
 
         }
 
-        public double EvaluateExpressionRecursive(Token[] tokens, double x, double y)
+        public double EvaluateExpressionRecursive(Token[] tokens)
         {
             Stack<Token> operatorStack = new Stack<Token>();
             Stack<Token> operandStack = new Stack<Token>();
@@ -103,7 +119,7 @@ namespace OpenTKCalculator
                             char curOp = tok.GetData<char>();
                             if (curOp == '(')
                             {
-                                tokens = EvaluateSubExpression(tokens, tok, x, y);
+                                tokens = EvaluateSubExpression(tokens, tok);
                                 if (tokens.Length > 0)
                                 {
                                     tok = tokens[i];
@@ -130,6 +146,10 @@ namespace OpenTKCalculator
                     case TokenType.NUMBER:
                         operandStack.Push(tok);
                         break;
+                    case TokenType.FUNCTION:
+                        tokens = EvaluateFunctionSubExpression(tokens, tok);
+                        i--;
+                        break;
                    
                 }
             }
@@ -148,7 +168,7 @@ namespace OpenTKCalculator
                 return double.NaN;
         }
 
-        private Token[] EvaluateSubExpression(Token[] tokens, Token openingBracket, double x, double y)
+        private Token[] EvaluateSubExpression(Token[] tokens, Token openingBracket)
         {
             List<Token> modifiedTokens = new List<Token>();
             List<Token> subExpression = new List<Token>();
@@ -188,7 +208,7 @@ namespace OpenTKCalculator
                     //then the subexpression is found
                     if (c == 0)
                     {
-                        modifiedTokens.Add(new Token(EvaluateExpressionRecursive(subExpression.ToArray(), x, y)));
+                        modifiedTokens.Add(new Token(EvaluateExpressionRecursive(subExpression.ToArray())));
                         evaluated = true;
                     }
                     else
@@ -198,6 +218,92 @@ namespace OpenTKCalculator
                     modifiedTokens.Add(token);
             }
             return modifiedTokens.ToArray();
+        }
+
+
+        private Token[] EvaluateFunctionSubExpression(Token[] tokens, Token functionToken)
+        {
+            List<Token> modifiedTokens = new List<Token>();
+            List<Token> subExpression = new List<Token>();
+            string func = functionToken.GetData<string>();
+            int numArguments = functionArgs[func];
+            List<double> arguments = new List<double>();
+
+            uint c = 0;
+            bool s = false;
+            bool evaluated = false;
+            int argumentsEvaluated = 0;
+            for(int i = 0; i<tokens.Length; i++)
+            {
+                Token token = tokens[i];
+                if (!s)
+                {
+                    if (token.Equals(functionToken))
+                    {
+                        s = true;
+                        c++;
+                        i++;
+                    }
+                    else
+                        modifiedTokens.Add(token);
+                }
+                else if (!evaluated)
+                {
+                    if (token.type == TokenType.OPERATOR)
+                    {
+                        char v = token.GetData<char>();
+                        if (v == '(')
+                            c++;
+                        else if (v == ')')
+                            c--;
+                        else if(v == ',')
+                        {
+                            arguments.Add(EvaluateExpressionRecursive(subExpression.ToArray()));
+                            subExpression.Clear();
+                            argumentsEvaluated++;
+                            continue;
+                        }
+                    }
+                    else if (token.type == TokenType.EOF)
+                    {
+                        parseException = new Exception("Invalid bracketing");
+                        modifiedTokens = new List<Token>();
+                        break;
+                    }
+
+                    //then the subexpression is found
+                    if (c == 0)
+                    {
+                        argumentsEvaluated++;
+                        if (argumentsEvaluated == numArguments)
+                        {
+                            arguments.Add(EvaluateExpressionRecursive(subExpression.ToArray()));
+                            evaluated = true;
+                            modifiedTokens.Add(new Token(EvaluateFunction(arguments, func)));
+                        } 
+                    }
+                    else
+                        subExpression.Add(token);
+                }
+                else
+                    modifiedTokens.Add(token);
+            }
+            return modifiedTokens.ToArray();
+        }
+
+        private double EvaluateFunction(List<double> arguments, string func)
+        {
+            if(func.Equals("Sin"))
+            {
+                return Math.Sin(arguments[0]);
+            }
+            else if(func.Equals("Cos"))
+            {
+                return Math.Cos(arguments[0]);
+            }
+
+            parseException = new Exception("Function not found.");
+            return 0;
         }
 
         private void EvaluateTopOfStack(Stack<Token> operatorStack, Stack<Token> operandStack)
