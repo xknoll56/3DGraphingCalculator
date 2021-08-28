@@ -62,7 +62,7 @@ namespace OpenTKCalculator
             gridMesh.color = new Vector3(1, 0, 0);
             renderer.AddMesh(gridMesh);
 
-            CalculationMesh dynMesh = CalculationMesh.GenerateCalculationMesh(-3.75f, 4.24f, -2.25f, 4.65f);
+            CalculationMesh dynMesh = CalculationMesh.GenerateCalculationMesh(-5, 5, -5, 5, interpreter, "0.05*x*x + 0.05*y*y");
             //renderer.AddMesh(dynMesh);
             Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
             dynMeshEntity.mesh = dynMesh;
@@ -143,7 +143,7 @@ namespace OpenTKCalculator
             {
                 //tokenizer.TokenizeExpression(expressionTextBox.Text);
                 //tokenizer.PrintTokens();
-                double res = interpreter.EvaluateSimpleExpression(expressionTextBox.Text);
+                double res = interpreter.EvaluateExpression(expressionTextBox.Text, 5, 0);
                 expressionTextBox.Text = res.ToString();
             }
         }

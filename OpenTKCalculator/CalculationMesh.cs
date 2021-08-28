@@ -87,5 +87,76 @@ namespace OpenTKCalculator
             return cMesh;
 
         }
+
+        public static CalculationMesh GenerateCalculationMesh(float xStart, float xEnd, float zStart, float zEnd, Interpreter interpreter, string expression)
+        {
+
+            List<float> planeVerts = new List<float>();
+            List<uint> planeIndices = new List<uint>();
+            //float xStart = -5, xEnd = 5;
+            //float zStart = -5, zEnd = 5;
+            uint divisions = (uint)(0.5 * (Math.Abs(xEnd - xStart) * 10 + Math.Abs(zEnd - zStart) * 10));
+            uint rows = 0, cols = 0;
+            bool rowsSet = false;
+            float dp = Math.Abs(xEnd - xStart) / divisions;
+            float x = xStart, z = zStart;
+            while (x < xEnd)
+            {
+                while (z < zEnd)
+                {
+                    planeVerts.Add(x);
+                    planeVerts.Add((float)interpreter.EvaluateExpression(expression, x, z));
+                    planeVerts.Add(z);
+                    if (!rowsSet)
+                        rows++;
+                    z += dp;
+                }
+                planeVerts.Add(x);
+                planeVerts.Add((float)interpreter.EvaluateExpression(expression, x, zEnd));
+                planeVerts.Add(zEnd);
+                if (!rowsSet)
+                    rows++;
+                rowsSet = true;
+                z = zStart;
+                x += dp;
+                cols++;
+            }
+            while (z < zEnd)
+            {
+                planeVerts.Add(xEnd);
+                planeVerts.Add((float)interpreter.EvaluateExpression(expression, xEnd, z));
+                planeVerts.Add(z);
+                z += dp;
+            }
+            planeVerts.Add(xEnd);
+            planeVerts.Add((float)interpreter.EvaluateExpression(expression, xEnd, zEnd));
+            planeVerts.Add(zEnd);
+            cols++;
+
+            for (uint col = 0; col < cols - 1; col++)
+            {
+                for (uint row = 0; row < rows - 1; row++)
+                {
+                    uint ind = rows * col + row;
+                    uint nextLineInd = rows * col + row + rows;
+
+                    planeIndices.Add(ind);
+                    planeIndices.Add(ind + 1);
+                    planeIndices.Add(nextLineInd + 1);
+
+                    planeIndices.Add(ind);
+                    planeIndices.Add(nextLineInd + 1);
+                    planeIndices.Add(nextLineInd);
+                }
+            }
+
+            CalculationMesh cMesh = new CalculationMesh(planeVerts.ToArray(), planeIndices.ToArray(), MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.DynamicDraw, true);
+            cMesh.xStart = xStart;
+            cMesh.xEnd = xEnd;
+            cMesh.zStart = zStart;
+            cMesh.zEnd = zEnd;
+            return cMesh;
+
+        }
     }
 }
