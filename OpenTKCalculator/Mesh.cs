@@ -19,13 +19,13 @@ namespace OpenTKCalculator
     }
     class Mesh
     {
-        public float[] vertices { get; }
-        public float[] normals { get; }
+        public float[] vertices { get; protected set; }
+        public float[] normals { get; protected set; }
         public uint[] indices { get; }
-        public int VertexBufferObject { get; }
-        public int NormalBufferObject { get; }
-        public int VertexArrayObject { get; }
-        public int ElementBufferObject { get; }
+        public int VertexBufferObject { get; private set; }
+        public int NormalBufferObject { get; private set; }
+        public int VertexArrayObject { get; private set; }
+        public int ElementBufferObject { get; private set; }
 
         public Texture texture { get; set; }
         public int shaderType { get; }
@@ -225,6 +225,99 @@ namespace OpenTKCalculator
             color = new Vector3(1, 1, 1);
         }
 
+        protected void UpdateBuffers(bool indexed = true)
+        { 
+            GL.BindVertexArray(VertexArrayObject);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, bufferUsageHint);
+            int stride = 8, textureOffset = 6, normalOffset = 3;
+            int typeNum = (int)meshType;
+
+            switch (renderType)
+            {
+                case RenderType.TRIANGLES:
+
+                    if (!calculateNormals)
+                    {
+                        if (typeNum == 3)
+                        {
+                            stride = 8;
+                        }
+                        else if (typeNum == 2)
+                        {
+                            stride = 6;
+                            textureOffset = 0;
+                        }
+                        else if (typeNum == 1)
+                        {
+                            stride = 8;
+                            textureOffset = 6;
+                        }
+
+                        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                        GL.EnableVertexAttribArray(0);
+
+                        GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
+                        GL.EnableVertexAttribArray(2);
+
+                        if ((typeNum & (int)MeshType.TEXTURED) != 0)
+                        {
+                            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride * sizeof(float), textureOffset * sizeof(float));
+                            GL.EnableVertexAttribArray(1);
+                        }
+                    }
+                    else
+                    {
+                        stride = 3;
+
+                        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                        GL.EnableVertexAttribArray(0);
+
+                        normals = new float[vertices.Length];
+                        for (uint i = 0; i < indices.Length; i += 3)
+                        {
+                            uint index1 = indices[i], index2 = indices[i + 1], index3 = indices[i + 2];
+                            Vector3 v1 = new Vector3(vertices[index1 * 3], vertices[index1 * 3 + 1], vertices[index1 * 3 + 2]);
+                            Vector3 v2 = new Vector3(vertices[index2 * 3], vertices[index2 * 3 + 1], vertices[index2 * 3 + 2]);
+                            Vector3 v3 = new Vector3(vertices[index3 * 3], vertices[index3 * 3 + 1], vertices[index3 * 3 + 2]);
+
+                            Vector3 normal = Vector3.Cross(v2 - v1, v3 - v1);
+                            normal.Normalize();
+                            normals[index1 * 3] = normal.X;
+                            normals[index1 * 3 + 1] = normal.Y;
+                            normals[index1 * 3 + 2] = normal.Z;
+                            normals[index2 * 3] = normal.X;
+                            normals[index2 * 3 + 1] = normal.Y;
+                            normals[index2 * 3 + 2] = normal.Z;
+                            normals[index3 * 3] = normal.X;
+                            normals[index3 * 3 + 1] = normal.Y;
+                            normals[index3 * 3 + 2] = normal.Z;
+                        }
+
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBufferObject);
+                        GL.BufferData(BufferTarget.ArrayBuffer, normals.Length * sizeof(float), normals, bufferUsageHint);
+
+                        GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                        GL.EnableVertexAttribArray(2);
+                    }
+                    break;
+                case RenderType.LINES:
+                    stride = 3;
+                    textureOffset = 0;
+                    normalOffset = 0;
+                    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                    GL.EnableVertexAttribArray(0);
+                    break;
+            }
+            if (indexed)
+            {
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ElementBufferObject);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+            }
+        }
+
+
         public Mesh(Mesh mesh): this(mesh.vertices, mesh.indices, mesh.meshType, mesh.renderType, mesh.bufferUsageHint, mesh.calculateNormals)
         {
 
@@ -234,6 +327,7 @@ namespace OpenTKCalculator
         {
             GL.DeleteBuffer(VertexBufferObject);
             GL.DeleteBuffer(ElementBufferObject);
+            GL.DeleteBuffer(NormalBufferObject);
             GL.DeleteVertexArray(VertexArrayObject);
         }
 

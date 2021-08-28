@@ -13,6 +13,7 @@ namespace OpenTKCalculator
         public float zStart { get; private set; }
         public float xEnd { get; private set; }
         public float zEnd { get; private set; }
+        public string expression { get; private set; }
         public CalculationMesh(float[] vertices, uint[] indices, MeshType meshType, RenderType renderType, BufferUsageHint bufferUsageHint, bool calculateNormals) : base(vertices, indices, meshType, renderType, bufferUsageHint, calculateNormals)
         {
         }
@@ -155,8 +156,18 @@ namespace OpenTKCalculator
             cMesh.xEnd = xEnd;
             cMesh.zStart = zStart;
             cMesh.zEnd = zEnd;
+            cMesh.expression = expression;
             return cMesh;
 
+        }
+
+        public void UpdateExpression(string expression, Interpreter interpreter)
+        {
+            for(uint ind = 0; ind<vertices.Length; ind+=3)
+            {
+                vertices[ind + 1] = (float)interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]);
+            }
+            UpdateBuffers();
         }
     }
 }
