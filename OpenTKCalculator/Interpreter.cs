@@ -6,12 +6,20 @@ namespace OpenTKCalculator
 {
     class Interpreter
     {
+        private delegate double Function1d(double x);
+        private delegate double Function2d(double x, double y);
+
+
         private Tokenizer tokenizer;
         private readonly Dictionary<char, int> operatorPrecidence;
         private readonly Dictionary<string, int> functionArgs;
+        private readonly Dictionary<string, Function1d> function1dDict;
+        private readonly Dictionary<string, Function2d> function2dDict;
         Exception parseException = null;
         Token openBrack;
         Token closedBrack;
+
+
 
         public Interpreter()
         {
@@ -35,6 +43,18 @@ namespace OpenTKCalculator
             functionArgs.Add("Abs", 1);
             functionArgs.Add("Min", 2);
             functionArgs.Add("Max", 2);
+            function1dDict = new Dictionary<string, Function1d>();
+            Function1d sinDel = Math.Sin; 
+            Function1d cosDel = Math.Cos; 
+            Function1d tanDel = Math.Tan;
+            function1dDict.Add("Sin", sinDel);
+            function1dDict.Add("Cos", cosDel);
+            function1dDict.Add("Tan", tanDel);
+            //functionDict.Add("Ln", 1);
+            //functionDict.Add("Log2", 1);
+            //functionDict.Add("Abs", 1);
+            //functionDict.Add("Min", 2);
+            //functionDict.Add("Max", 2);
             openBrack = new Token('(');
             closedBrack = new Token(')');
         }
@@ -293,13 +313,12 @@ namespace OpenTKCalculator
 
         private double EvaluateFunction(List<double> arguments, string func)
         {
-            if(func.Equals("Sin"))
+            switch(arguments.Count)
             {
-                return Math.Sin(arguments[0]);
-            }
-            else if(func.Equals("Cos"))
-            {
-                return Math.Cos(arguments[0]);
+                case 1:
+                    return function1dDict[func](arguments[0]);
+                case 2:
+                    return function2dDict[func](arguments[0], arguments[1]);
             }
 
             parseException = new Exception("Function not found.");
