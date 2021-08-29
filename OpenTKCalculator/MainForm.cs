@@ -21,7 +21,7 @@ namespace OpenTKCalculator
         Renderer renderer;
         //Tokenizer tokenizer;
         Interpreter interpreter;
-        CalculationMesh dynMesh;
+        CalculationMesh[] dynMeshes;
 
         public MainForm()
         {
@@ -39,7 +39,7 @@ namespace OpenTKCalculator
 
 
             List<float> gridVerts = new List<float>();
-            int gridSize = 5;
+            int gridSize = 50;
             for(int i = -gridSize; i<= gridSize; i++)
             {
                 gridVerts.Add(i);
@@ -59,17 +59,22 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.StaticDraw);
-            gridMesh.color = new Vector3(1, 0, 0);
-            renderer.AddMesh(gridMesh);
+            //Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.StaticDraw);
+            //gridMesh.color = new Vector3(1, 0, 0);
+            //renderer.AddMesh(gridMesh);
 
-            dynMesh = CalculationMesh.GenerateCalculationMesh(-5, 5, -5, 5);
+            dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
+            for(int i =0;i<dynMeshes.Length; i++)
+            {
+                renderer.AddMesh(dynMeshes[i]);
+            }
+            //dynMesh = CalculationMesh.GenerateCalculationMesh(-50, 50, -50, 50);
             //renderer.AddMesh(dynMesh);
-            Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
-            dynMeshEntity.mesh = dynMesh;
-            dynMesh.color = new Vector3(0, 1, 1);
+            //Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
+           // dynMeshEntity.mesh = dynMesh;
+            //dynMesh.color = new Vector3(0, 1, 1);
             // renderer.AddEntity(dynMeshEntity);
-            renderer.AddMesh(dynMesh);
+           // renderer.AddMesh(dynMesh);
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -142,11 +147,10 @@ namespace OpenTKCalculator
         {
             if(e.KeyCode == Keys.Enter)
             {
-                //tokenizer.TokenizeExpression(expressionTextBox.Text);
-                //tokenizer.PrintTokens();
-                //double res = interpreter.EvaluateExpression(expressionTextBox.Text, 5, 0);
-                //expressionTextBox.Text = res.ToString();
-                dynMesh.UpdateExpression(expressionTextBox.Text, interpreter);
+                for (int i = 0; i < dynMeshes.Length; i++)
+                {
+                    dynMeshes[i].UpdateExpression(expressionTextBox.Text, interpreter);
+                }
             }
         }
     }

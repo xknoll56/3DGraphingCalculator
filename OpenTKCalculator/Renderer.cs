@@ -19,7 +19,7 @@ namespace OpenTKCalculator
         private Shader shader;
         private Shader gridShader;
         private Camera mainCamera;
-        private List<Mesh> meshes;
+        private List<CalculationMesh> meshes;
         private List<Entity> entities;
         Vector3 rotationTest = new Vector3();
         public bool canControl { get; set; }
@@ -58,7 +58,7 @@ namespace OpenTKCalculator
 
             stopwatch = new Stopwatch();
             stopwatch.Start();
-            meshes = new List<Mesh>();
+            meshes = new List<CalculationMesh>();
             entities = new List<Entity>();
             canControl = false;
 
@@ -133,10 +133,47 @@ namespace OpenTKCalculator
                 glControl.MakeCurrent();    // Tell OpenGL to draw on MyGLControl.
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            foreach (Mesh mesh in meshes)
+            //foreach (Mesh mesh in meshes)
+            //{
+            //    shader.SetMatrix4("model", Matrix4.Identity);
+            //    shader.SetVec3("color", mesh.color);                
+            //    if (mesh.renderType == RenderType.TRIANGLES)
+            //    {
+            //        shader.Use();
+            //        if (mesh.indexed)
+            //        {
+
+            //            shader.SetInt("type", mesh.shaderType);
+            //            if (mesh.meshType == MeshType.TEXTURED)
+            //                mesh.texture.Use(TextureUnit.Texture0);
+            //            GL.BindVertexArray(mesh.VertexArrayObject);
+            //            GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+            //        }
+            //        else
+            //        {
+            //            shader.SetInt("type", mesh.shaderType);
+            //            if (mesh.meshType == MeshType.TEXTURED)
+            //                mesh.texture.Use(TextureUnit.Texture0);
+            //            GL.BindVertexArray(mesh.VertexArrayObject);
+            //            GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.numVerts);
+            //        }
+            //    }
+            //    else if (mesh.renderType == RenderType.LINES)
+            //    {
+            //        //gridShader.Use();
+            //        gridShader.SetVec3("color", mesh.color);
+            //        GL.UseProgram(gridShader.GetHandle());
+            //        GL.BindVertexArray(mesh.VertexArrayObject);
+            //        GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
+            //    }
+                
+            //}
+
+
+            foreach (CalculationMesh mesh in meshes)
             {
                 shader.SetMatrix4("model", Matrix4.Identity);
-                shader.SetVec3("color", mesh.color);                
+                shader.SetVec3("color", mesh.color);
                 if (mesh.renderType == RenderType.TRIANGLES)
                 {
                     shader.Use();
@@ -166,6 +203,16 @@ namespace OpenTKCalculator
                     GL.BindVertexArray(mesh.VertexArrayObject);
                     GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
                 }
+
+
+                if(mesh.gridMesh != null)
+                {
+                    gridShader.SetVec3("color", new Vector3(1,0,0));
+                    GL.UseProgram(gridShader.GetHandle());
+                    GL.BindVertexArray(mesh.gridMesh.VertexArrayObject);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.gridMesh.numVerts);
+                }
+
             }
 
 
@@ -208,7 +255,7 @@ namespace OpenTKCalculator
             glControl.Invalidate();
         }
 
-        public void AddMesh(Mesh mesh)
+        public void AddMesh(CalculationMesh mesh)
         {
             meshes.Add(mesh);
         }
