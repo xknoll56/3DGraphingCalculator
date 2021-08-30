@@ -147,9 +147,18 @@ namespace OpenTKCalculator
         {
             if(e.KeyCode == Keys.Enter)
             {
+                var s = new Stopwatch();
+                s.Start();
                 for (int i = 0; i < dynMeshes.Length; i++)
                 {
                     dynMeshes[i].UpdateExpression(expressionTextBox.Text);
+                }
+                s.Stop();
+                Console.WriteLine(s.ElapsedMilliseconds);
+
+                for (int i = 0; i < dynMeshes.Length; i++)
+                {
+                    dynMeshes[i].UpdateBuffers();
                 }
             }
         }

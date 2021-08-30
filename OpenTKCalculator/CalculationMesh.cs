@@ -328,13 +328,20 @@ namespace OpenTKCalculator
             {
                 vertices[ind + 1] = (float)interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]);
             }
-            UpdateBuffers();
             if(gridMesh != null)
             {
                 for (uint ind = 0; ind < gridMesh.vertices.Length; ind += 3)
                 {
                     gridMesh.vertices[ind + 1] = (float)interpreter.EvaluateExpression(expression, gridMesh.vertices[ind], gridMesh.vertices[ind + 2]) + gridLineOffset;
                 }
+            }
+        }
+
+        public override void UpdateBuffers(bool indexed = true)
+        {
+            base.UpdateBuffers(indexed);
+            if (gridMesh != null)
+            {
                 gridMesh.UpdateBuffers(false);
             }
         }
