@@ -22,7 +22,6 @@ namespace OpenTKCalculator
         //Tokenizer tokenizer;
         Interpreter interpreter;
         CalculationMesh[] dynMeshes;
-
         public MainForm()
         {
             InitializeComponent();
@@ -68,13 +67,14 @@ namespace OpenTKCalculator
             {
                 renderer.AddMesh(dynMeshes[i]);
             }
+            Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression("0"))));
             //dynMesh = CalculationMesh.GenerateCalculationMesh(-50, 50, -50, 50);
             //renderer.AddMesh(dynMesh);
             //Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
-           // dynMeshEntity.mesh = dynMesh;
+            // dynMeshEntity.mesh = dynMesh;
             //dynMesh.color = new Vector3(0, 1, 1);
             // renderer.AddEntity(dynMeshEntity);
-           // renderer.AddMesh(dynMesh);
+            // renderer.AddMesh(dynMesh);
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -147,12 +147,16 @@ namespace OpenTKCalculator
         {
             if(e.KeyCode == Keys.Enter)
             {
-                Task[] tasks = new Task[dynMeshes.Length];
-                for(int i = 0;i<dynMeshes.Length;i++)
+                var watch = new Stopwatch();
+                watch.Start();
+                await Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression(expressionTextBox.Text))));
+                watch.Stop();
+                Console.WriteLine(watch.ElapsedMilliseconds);
+
+                for (int i = 0; i < dynMeshes.Length; i++)
                 {
-                    tasks[i] = dynMeshes[i].UpdateExpression(expressionTextBox.Text);
+                    dynMeshes[i].UpdateBuffers();
                 }
-                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
     }

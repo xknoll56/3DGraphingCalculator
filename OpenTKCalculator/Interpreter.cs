@@ -90,7 +90,7 @@ namespace OpenTKCalculator
             }
         }
 
-        public async Task<float> EvaluateExpression(string expression)
+        public float EvaluateExpression(string expression)
         {
             tokenizer.TokenizeExpression(expression);
             List<Token> tokens = tokenizer.tokens;
@@ -106,7 +106,7 @@ namespace OpenTKCalculator
 
         }
 
-        public async Task<float> EvaluateExpression(string expression, double x, double y)
+        public float EvaluateExpression(string expression, double x, double y)
         {
             tokenizer.TokenizeExpression(expression);
             List<Token> tokens = tokenizer.tokens;

@@ -326,20 +326,26 @@ namespace OpenTKCalculator
         {
             for (uint ind = 0; ind < vertices.Length; ind += 3)
             {
-                vertices[ind + 1] = await Task.Run(() => interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]));
+                vertices[ind + 1] = interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]);
             }
-            UpdateBuffers();
             if(gridMesh != null)
             {
                 for (uint ind = 0; ind < gridMesh.vertices.Length; ind += 3)
                 {
-                    gridMesh.vertices[ind + 1] = await Task.Run(() => interpreter.EvaluateExpression(expression, gridMesh.vertices[ind], gridMesh.vertices[ind + 2]));
+                    gridMesh.vertices[ind + 1] = interpreter.EvaluateExpression(expression, gridMesh.vertices[ind], gridMesh.vertices[ind + 2]);
                     gridMesh.vertices[ind + 1] += gridLineOffset;
                 }
+            }
+            //UpdateBuffers();
+        }
+
+        public void UpdateBuffers(bool indexed = true)
+        {
+            base.UpdateBuffers(indexed);
+            if (gridMesh != null)
+            {
                 gridMesh.UpdateBuffers(false);
             }
-
-            Console.WriteLine(xStart + " " + xEnd + " " + zStart + " " + zEnd);
         }
     }
 }
