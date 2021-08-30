@@ -339,7 +339,7 @@ namespace OpenTKCalculator
             //UpdateBuffers();
         }
 
-        public void UpdateBuffers(bool indexed = true)
+        public override void UpdateBuffers(bool indexed = true)
         {
             base.UpdateBuffers(indexed);
             if (gridMesh != null)

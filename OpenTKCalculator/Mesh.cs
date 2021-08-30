@@ -225,7 +225,7 @@ namespace OpenTKCalculator
             color = new Vector3(1, 1, 1);
         }
 
-        public void UpdateBuffers(bool indexed = true)
+        public virtual void UpdateBuffers(bool indexed = true)
         { 
             GL.BindVertexArray(VertexArrayObject);
 
