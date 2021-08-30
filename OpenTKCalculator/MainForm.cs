@@ -149,7 +149,7 @@ namespace OpenTKCalculator
             {
                 for (int i = 0; i < dynMeshes.Length; i++)
                 {
-                    dynMeshes[i].UpdateExpression(expressionTextBox.Text, interpreter);
+                    dynMeshes[i].UpdateExpression(expressionTextBox.Text);
                 }
             }
         }
