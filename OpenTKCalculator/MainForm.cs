@@ -143,14 +143,16 @@ namespace OpenTKCalculator
                 Input.mouse[2] = false;
         }
 
-        private void expressionTextBox_KeyDown(object sender, KeyEventArgs e)
+        private async void expressionTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.KeyCode == Keys.Enter)
             {
-                for (int i = 0; i < dynMeshes.Length; i++)
+                Task[] tasks = new Task[dynMeshes.Length];
+                for(int i = 0;i<dynMeshes.Length;i++)
                 {
-                    dynMeshes[i].UpdateExpression(expressionTextBox.Text);
+                    tasks[i] = dynMeshes[i].UpdateExpression(expressionTextBox.Text);
                 }
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
     }
