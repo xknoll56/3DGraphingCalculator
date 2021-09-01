@@ -46,6 +46,21 @@ namespace OpenTKCalculator
                 UpdateModel();
             }
         }
+        private Vector3 euler;
+        public Vector3 Euler
+        {
+            get
+            {
+                return euler;
+            }
+            set
+            {
+                euler = value;
+                rotation = Quaternion.FromEulerAngles(euler);
+                UpdateModel();
+            }
+        }
+
         public Vector3 color { get; set; }
         public Matrix4 model { get; private set; }
         private Matrix4 translationMatrix;
@@ -53,7 +68,7 @@ namespace OpenTKCalculator
         private Matrix4 rotationMatrix;
 
         public Mesh mesh { get; set; }
-        public List<Entity> children;
+        public List<Entity> children { get; private set; }
 
         public Entity(Vector3 position, Vector3 scale, Quaternion rotation)
         {
@@ -83,6 +98,12 @@ namespace OpenTKCalculator
             rotationMatrix = Matrix4.CreateFromQuaternion(rotation);
             model = scaleMatrix*rotationMatrix*translationMatrix;
         }
+
+        public void AddChild(Entity entity)
+        {
+            children.Add(entity);
+        }
+
 
     }
 }

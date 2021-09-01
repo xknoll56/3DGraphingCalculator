@@ -69,18 +69,24 @@ namespace OpenTKCalculator
 
             Mesh mesh = new Mesh(StaticVertices.cylinderVertices, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
 
-            Entity parent = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
+            Entity unitDirs = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
 
-            Entity entity = new Entity(new Vector3(), new Vector3(0.25f,1, 0.25f), new Quaternion(new Vector3()));
+            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.25f,5, 0.25f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
             entity.mesh = mesh;
             entity.color = new Vector3(1, 0, 0);
-            parent.children.Add(entity);
+            unitDirs.AddChild(entity);
 
-            Entity entity2 = new Entity(new Vector3(0, -0.5f, 0), new Vector3(0.25f, 1, 0.25f), new Quaternion(new Vector3((float)Math.PI*0.5f, 0, 0)));
+            Entity entity2 = new Entity(new Vector3(0, 2.5f, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, 0)));
             entity2.mesh = mesh;
             entity2.color = new Vector3(0, 1, 0);
-            parent.children.Add(entity2);
-            renderer.AddEntity(parent);
+            unitDirs.AddChild(entity2);
+
+            Entity entity3 = new Entity(new Vector3(2.5f, 0, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, (float)Math.PI * 0.5f)));
+            entity3.mesh = mesh;
+            entity3.color = new Vector3(0, 0, 1);
+            unitDirs.AddChild(entity3);
+
+            renderer.AddEntity(unitDirs);
             //renderer.AddMesh(mesh);
         }
 

@@ -22,7 +22,7 @@ namespace OpenTKCalculator
         private List<CalculationMesh> calculationMeshes;
         private List<Mesh> meshes;
         private List<Entity> parentEntities;
-        Vector3 rotationTest = new Vector3();
+        private Matrix4 IDENTITY = Matrix4.Identity;
         public bool canControl { get; set; }
         public bool Initialize(GLControl gLControl)
         {
@@ -156,35 +156,26 @@ namespace OpenTKCalculator
 
             }
 
-
+            // parentEntities[0].Rotation = new Quaternion(rotationTest);
+            parentEntities[0].Euler += new Vector3(0.25f * dt, dt, 0.5f * dt);
             foreach (Entity entity in parentEntities)
             {
-                DrawEntity(entity);
+                DrawEntity(ref IDENTITY, entity);
             }
 
             glControl.SwapBuffers();    // Display the result.
             glControl.Invalidate();
         }
 
-        private void DrawEntity(Entity entity)
+        private void DrawEntity(ref Matrix4 parentTransform, Entity entity)
         {
-            Matrix4 model = entity.model;
-            shader.SetVec3("color", entity.color);
-            shader.SetMatrix4("model", model);
-            if(entity.mesh!=null)
-                DrawMesh(shader, entity.mesh, entity.color);
-            foreach (Entity child in entity.children)
-                DrawChildrenEntities(ref model, child);
-        }
-        private void DrawChildrenEntities(ref Matrix4 parentTransform, Entity entity)
-        {
-            Matrix4 trans = parentTransform * entity.model;
+            Matrix4 trans = entity.model*parentTransform;
             shader.SetVec3("color", entity.color);
             shader.SetMatrix4("model", trans);
             if (entity.mesh != null)
                 DrawMesh(shader, entity.mesh, entity.color);
             foreach (Entity child in entity.children)
-                DrawChildrenEntities(ref trans, child);
+                DrawEntity(ref trans, child);
         }
 
         private void DrawMesh(Shader shader, Mesh mesh)

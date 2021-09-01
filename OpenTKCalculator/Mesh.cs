@@ -407,7 +407,7 @@ namespace OpenTKCalculator
 
             for (int i = 0; i < points; i++)
             {
-                float theta = 2.0f * (float)Math.PI * i / points;
+                float  theta = 2.0f * (float)Math.PI * (i) / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
                 vertices.Add(0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
@@ -416,7 +416,7 @@ namespace OpenTKCalculator
                 vertices.Add(0.5f);
                 vertices.Add(0);
 
-                theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                theta = 2.0f * (float)Math.PI * (i+1) / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
                 vertices.Add(0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
@@ -424,7 +424,7 @@ namespace OpenTKCalculator
 
             for (int i = 0; i < points; i++)
             {
-                float theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                float theta = 2.0f * (float)Math.PI * (i+1) / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
                 vertices.Add(-0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
@@ -433,7 +433,7 @@ namespace OpenTKCalculator
                 vertices.Add(-0.5f);
                 vertices.Add(0);
 
-                theta = 2.0f * (float)Math.PI * i / points;
+                theta = 2.0f * (float)Math.PI * (i) / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
                 vertices.Add(-0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
@@ -444,11 +444,11 @@ namespace OpenTKCalculator
             {
                 float theta = 2.0f * (float)Math.PI * i / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
-                vertices.Add(0.5f);
+                vertices.Add(-0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
 
                 vertices.Add(0.5f * (float)Math.Cos(theta));
-                vertices.Add(-0.5f);
+                vertices.Add(0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
 
                 theta = 2.0f * (float)Math.PI * (i + 1) / points;
@@ -456,15 +456,14 @@ namespace OpenTKCalculator
                 vertices.Add(0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
 
-                vertices.Add(0.5f * (float)Math.Cos(theta));
-                vertices.Add(-0.5f);
-                vertices.Add(0.5f * (float)Math.Sin(theta));
-
-
-
                 theta = 2.0f * (float)Math.PI * (i + 1) / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
                 vertices.Add(0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));
 
                 theta = 2.0f * (float)Math.PI * i / points;
