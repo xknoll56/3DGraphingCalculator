@@ -22,7 +22,6 @@ namespace OpenTKCalculator
         //Tokenizer tokenizer;
         Interpreter interpreter;
         CalculationMesh[] dynMeshes;
-
         public MainForm()
         {
             InitializeComponent();
@@ -33,6 +32,7 @@ namespace OpenTKCalculator
         {
             base.OnLoad(e);
 
+            StaticVertices.SetVertices();
             renderer = new Renderer();
             interpreter = new Interpreter();
             renderer.Initialize(glControl1);
@@ -59,22 +59,35 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            //Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.StaticDraw);
-            //gridMesh.color = new Vector3(1, 0, 0);
-            //renderer.AddMesh(gridMesh);
+            //dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -10, -10, 10, 10);
+            //for (int i = 0; i < dynMeshes.Length; i++)
+            //{
+            //    renderer.AddCalculationMesh(dynMeshes[i]);
+            //}
 
-            dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
-            for(int i =0;i<dynMeshes.Length; i++)
-            {
-                renderer.AddMesh(dynMeshes[i]);
-            }
-            //dynMesh = CalculationMesh.GenerateCalculationMesh(-50, 50, -50, 50);
-            //renderer.AddMesh(dynMesh);
-            //Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
-           // dynMeshEntity.mesh = dynMesh;
-            //dynMesh.color = new Vector3(0, 1, 1);
-            // renderer.AddEntity(dynMeshEntity);
-           // renderer.AddMesh(dynMesh);
+
+
+            Mesh mesh = new Mesh(StaticVertices.cylinderVertices, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
+
+            Entity unitDirs = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
+
+            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.25f,5, 0.25f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
+            entity.mesh = mesh;
+            entity.color = new Vector3(1, 0, 0);
+            unitDirs.AddChild(entity);
+
+            Entity entity2 = new Entity(new Vector3(0, 2.5f, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, 0)));
+            entity2.mesh = mesh;
+            entity2.color = new Vector3(0, 1, 0);
+            unitDirs.AddChild(entity2);
+
+            Entity entity3 = new Entity(new Vector3(2.5f, 0, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, (float)Math.PI * 0.5f)));
+            entity3.mesh = mesh;
+            entity3.color = new Vector3(0, 0, 1);
+            unitDirs.AddChild(entity3);
+
+            renderer.AddEntity(unitDirs);
+            //renderer.AddMesh(mesh);
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -85,7 +98,7 @@ namespace OpenTKCalculator
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            renderer.OnQuit();
+            renderer.Dispose();
         }
         
         protected override void OnKeyDown(KeyEventArgs e)
@@ -143,18 +156,15 @@ namespace OpenTKCalculator
                 Input.mouse[2] = false;
         }
 
-        private void expressionTextBox_KeyDown(object sender, KeyEventArgs e)
+        private async void expressionTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.KeyCode == Keys.Enter)
             {
-                var s = new Stopwatch();
-                s.Start();
-                for (int i = 0; i < dynMeshes.Length; i++)
-                {
-                    dynMeshes[i].UpdateExpression(expressionTextBox.Text);
-                }
-                s.Stop();
-                Console.WriteLine(s.ElapsedMilliseconds);
+                var watch = new Stopwatch();
+                watch.Start();
+                await Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression(expressionTextBox.Text))));
+                watch.Stop();
+                Console.WriteLine(watch.ElapsedMilliseconds);
 
                 for (int i = 0; i < dynMeshes.Length; i++)
                 {

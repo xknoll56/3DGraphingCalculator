@@ -14,7 +14,7 @@ uniform vec3 color;
 void main()
 {
     vec3 ambient = vec3(1, 1, 1);
-    vec3 lightDir = normalize(vec3(1, -1,  1));
+    vec3 lightDir = normalize(vec3(-1, -1,  -1));
     float diffuse = max(dot(Normal, lightDir), 0.35);
 
     if(type == 3)

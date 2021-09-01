@@ -229,7 +229,7 @@ namespace OpenTKCalculator
             cMesh.zStart = zStart;
             cMesh.zEnd = zEnd;
 
-            cMesh.gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.DynamicDraw);
+            cMesh.gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.DynamicDraw, false);
             return cMesh;
         }
 
@@ -322,19 +322,21 @@ namespace OpenTKCalculator
 
         //}
 
-        public void UpdateExpression(string expression)
+        public async Task UpdateExpression(string expression)
         {
             for (uint ind = 0; ind < vertices.Length; ind += 3)
             {
-                vertices[ind + 1] = (float)interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]);
+                vertices[ind + 1] = interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]);
             }
             if(gridMesh != null)
             {
                 for (uint ind = 0; ind < gridMesh.vertices.Length; ind += 3)
                 {
-                    gridMesh.vertices[ind + 1] = (float)interpreter.EvaluateExpression(expression, gridMesh.vertices[ind], gridMesh.vertices[ind + 2]) + gridLineOffset;
+                    gridMesh.vertices[ind + 1] = interpreter.EvaluateExpression(expression, gridMesh.vertices[ind], gridMesh.vertices[ind + 2]);
+                    gridMesh.vertices[ind + 1] += gridLineOffset;
                 }
             }
+            //UpdateBuffers();
         }
 
         public override void UpdateBuffers(bool indexed = true)

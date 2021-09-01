@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenTKCalculator
 {
@@ -89,7 +90,7 @@ namespace OpenTKCalculator
             }
         }
 
-        public double EvaluateExpression(string expression)
+        public float EvaluateExpression(string expression)
         {
             tokenizer.TokenizeExpression(expression);
             List<Token> tokens = tokenizer.tokens;
@@ -99,13 +100,13 @@ namespace OpenTKCalculator
             if(tokens.FindAll(new Predicate<Token>(FindOpenBrackets)).Count != tokens.FindAll(new Predicate<Token>(FindClosedBrackets)).Count)
             {
                 parseException = new Exception("Invalid bracketing");
-                return double.NaN;
+                return float.NaN;
             }
-            return EvaluateExpressionRecursive(tokens.ToArray());
+            return (float)EvaluateExpressionRecursive(tokens.ToArray());
 
         }
 
-        public double EvaluateExpression(string expression, double x, double y)
+        public float EvaluateExpression(string expression, double x, double y)
         {
             tokenizer.TokenizeExpression(expression);
             List<Token> tokens = tokenizer.tokens;
@@ -115,9 +116,9 @@ namespace OpenTKCalculator
             if (tokens.FindAll(new Predicate<Token>(FindOpenBrackets)).Count != tokens.FindAll(new Predicate<Token>(FindClosedBrackets)).Count)
             {
                 parseException = new Exception("Invalid bracketing");
-                return double.NaN;
+                return float.NaN;
             }
-            return EvaluateExpressionRecursive(tokens.ToArray());
+            return (float)EvaluateExpressionRecursive(tokens.ToArray());
 
         }
 
