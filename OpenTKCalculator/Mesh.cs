@@ -17,7 +17,7 @@ namespace OpenTKCalculator
         LINES = 1,
         POINTS = 2
     }
-    class Mesh
+    class Mesh: IDisposable
     {
         public float[] vertices { get; protected set; }
         public float[] normals { get; protected set; }
@@ -42,7 +42,7 @@ namespace OpenTKCalculator
         {
 
         }
-        public Mesh(float[] vertices, MeshType meshType, RenderType renderType, BufferUsageHint bufferUsageHint)
+        public Mesh(float[] vertices, MeshType meshType, RenderType renderType, BufferUsageHint bufferUsageHint, bool calculateNormals)
         {
             this.vertices = vertices;
 
@@ -61,32 +61,69 @@ namespace OpenTKCalculator
             {
                 case RenderType.TRIANGLES:
 
-
-                    if (typeNum == 3)
+                    if (!calculateNormals)
                     {
-                        stride = 8;
+                        if (typeNum == 3)
+                        {
+                            stride = 8;
+                        }
+                        else if (typeNum == 2)
+                        {
+                            stride = 6;
+                            textureOffset = 0;
+                        }
+                        else if (typeNum == 1)
+                        {
+                            stride = 8;
+                            textureOffset = 6;
+                        }
+
+                        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                        GL.EnableVertexAttribArray(0);
+
+                        GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
+                        GL.EnableVertexAttribArray(2);
+
+                        if ((typeNum & (int)MeshType.TEXTURED) != 0)
+                        {
+                            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride * sizeof(float), textureOffset * sizeof(float));
+                            GL.EnableVertexAttribArray(1);
+                        }
                     }
-                    else if (typeNum == 2)
+                    else
                     {
-                        stride = 6;
-                        textureOffset = 0;
-                    }
-                    else if (typeNum == 1)
-                    {
-                        stride = 8;
-                        textureOffset = 6;
-                    }
+                        stride = 3;
 
-                    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
-                    GL.EnableVertexAttribArray(0);
+                        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                        GL.EnableVertexAttribArray(0);
 
-                    GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), normalOffset * sizeof(float));
-                    GL.EnableVertexAttribArray(2);
+                        normals = new float[vertices.Length];
+                        for (uint i = 0; i < vertices.Length; i += 9)
+                        {
+                            uint index1 = i, index2 = i+3, index3 = i+6;
+                            Vector3 v1 = new Vector3(vertices[index1 ], vertices[index1  + 1], vertices[index1 + 2]);
+                            Vector3 v2 = new Vector3(vertices[index2 ], vertices[index2  + 1], vertices[index2 + 2]);
+                            Vector3 v3 = new Vector3(vertices[index3 ], vertices[index3  + 1], vertices[index3 + 2]);
 
-                    if ((typeNum & (int)MeshType.TEXTURED) != 0)
-                    {
-                        GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride * sizeof(float), textureOffset * sizeof(float));
-                        GL.EnableVertexAttribArray(1);
+                            Vector3 normal = Vector3.Cross(v2 - v1, v3 - v1);
+                            normal.Normalize();
+                            normals[index1] = normal.X;
+                            normals[index1 + 1] = normal.Y;
+                            normals[index1 + 2] = normal.Z;
+                            normals[index2] = normal.X;
+                            normals[index2 + 1] = normal.Y;
+                            normals[index2 + 2] = normal.Z;
+                            normals[index3] = normal.X;
+                            normals[index3 + 1] = normal.Y;
+                            normals[index3 + 2] = normal.Z;
+                        }
+
+                        NormalBufferObject = GL.GenBuffer();
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBufferObject);
+                        GL.BufferData(BufferTarget.ArrayBuffer, normals.Length * sizeof(float), normals, bufferUsageHint);
+
+                        GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, stride * sizeof(float), 0);
+                        GL.EnableVertexAttribArray(2);
                     }
                     break;
                 case RenderType.LINES:
@@ -323,40 +360,148 @@ namespace OpenTKCalculator
 
         }
 
-        public void OnDelete()
+
+        public void Dispose()
         {
             GL.DeleteBuffer(VertexBufferObject);
             GL.DeleteBuffer(ElementBufferObject);
             GL.DeleteBuffer(NormalBufferObject);
             GL.DeleteVertexArray(VertexArrayObject);
         }
+    }
+    static class StaticVertices
+    {
 
-        static class StaticVertices
+        public const int points = 30;
+        public static void SetVertices()
         {
-            static float[] vertices = {
+            List<float> vertices = new List<float>();
+            List<uint> indices = new List<uint>();
+
+            vertices.Add(0);
+            vertices.Add(0);
+            vertices.Add(0);
+
+            for (int i = 0; i < points; i++)
+            {
+                float theta = 2.0f * (float)Math.PI * i / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(0.0f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+            }
+
+            for (uint i = 1; i < points; i++)
+            {
+                indices.Add(i);
+                indices.Add(0);
+                indices.Add(i + 1);
+            }
+            indices.Add((uint)points);
+            indices.Add(0);
+            indices.Add(1);
+            circleVertices = vertices.ToArray();
+            circleIndices = indices.ToArray();
+
+            vertices = new List<float>();
+
+
+            for (int i = 0; i < points; i++)
+            {
+                float theta = 2.0f * (float)Math.PI * i / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                vertices.Add(0);
+                vertices.Add(0.5f);
+                vertices.Add(0);
+
+                theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+            }
+
+            for (int i = 0; i < points; i++)
+            {
+                float theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                vertices.Add(0);
+                vertices.Add(-0.5f);
+                vertices.Add(0);
+
+                theta = 2.0f * (float)Math.PI * i / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+            }
+
+            for (int i = 0; i < points; i++)
+            {
+                float theta = 2.0f * (float)Math.PI * i / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+
+
+                theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                theta = 2.0f * (float)Math.PI * i / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+            }
+            cylinderVertices = vertices.ToArray();
+        }
+
+        public static float[] cylinderVertices = new float[1080];
+        public static float[] circleVertices = new float[93];
+        public static uint[] circleIndices = new uint[90];
+        public static float[] vertices = {
              0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
              0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom right
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
             -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f   // top left
             };
-            static float[] colVertices = {
+        public static float[] colVertices = {
              0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
              0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // bottom right
             -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // bottom left
             -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f,  // top left
             };
-            static float[] texVertices = {
+        public static float[] texVertices = {
              0.5f,  0.5f, 0.0f, 1.0f, 1.0f,  // top right
              0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
             -0.5f,  0.5f, 0.0f, 0.0f, 1.0f   // top left
             };
-            static uint[] indices = {  // note that we start from 0!
+        public static uint[] indices = {  // note that we start from 0!
             0, 3, 1,   // first triangle
             1, 3, 2    // second triangle
             };
 
-            static float[] cubeVertices = {
+        public static float[] cubeVertices = {
             -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
              0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
              0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
@@ -400,7 +545,7 @@ namespace OpenTKCalculator
             -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
             };
 
-            static float[] cubeVerticesNoTexture = {
+        public static float[] cubeVerticesNoTexture = {
             -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
              0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
              0.5f,  0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
@@ -443,7 +588,5 @@ namespace OpenTKCalculator
             -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
             -0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
             };
-        }
-
     }
 }

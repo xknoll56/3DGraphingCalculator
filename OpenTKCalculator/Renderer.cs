@@ -12,14 +12,15 @@ using System.Windows.Forms;
 
 namespace OpenTKCalculator
 {
-    class Renderer
+    class Renderer: IDisposable
     {
         private GLControl glControl;
         private Stopwatch stopwatch;
         private Shader shader;
         private Shader gridShader;
         private Camera mainCamera;
-        private List<CalculationMesh> meshes;
+        private List<CalculationMesh> calculationMeshes;
+        private List<Mesh> meshes;
         private List<Entity> entities;
         Vector3 rotationTest = new Vector3();
         public bool canControl { get; set; }
@@ -58,7 +59,8 @@ namespace OpenTKCalculator
 
             stopwatch = new Stopwatch();
             stopwatch.Start();
-            meshes = new List<CalculationMesh>();
+            calculationMeshes = new List<CalculationMesh>();
+            meshes = new List<Mesh>();
             entities = new List<Entity>();
             canControl = false;
 
@@ -133,77 +135,16 @@ namespace OpenTKCalculator
                 glControl.MakeCurrent();    // Tell OpenGL to draw on MyGLControl.
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            //foreach (Mesh mesh in meshes)
-            //{
-            //    shader.SetMatrix4("model", Matrix4.Identity);
-            //    shader.SetVec3("color", mesh.color);                
-            //    if (mesh.renderType == RenderType.TRIANGLES)
-            //    {
-            //        shader.Use();
-            //        if (mesh.indexed)
-            //        {
-
-            //            shader.SetInt("type", mesh.shaderType);
-            //            if (mesh.meshType == MeshType.TEXTURED)
-            //                mesh.texture.Use(TextureUnit.Texture0);
-            //            GL.BindVertexArray(mesh.VertexArrayObject);
-            //            GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
-            //        }
-            //        else
-            //        {
-            //            shader.SetInt("type", mesh.shaderType);
-            //            if (mesh.meshType == MeshType.TEXTURED)
-            //                mesh.texture.Use(TextureUnit.Texture0);
-            //            GL.BindVertexArray(mesh.VertexArrayObject);
-            //            GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.numVerts);
-            //        }
-            //    }
-            //    else if (mesh.renderType == RenderType.LINES)
-            //    {
-            //        //gridShader.Use();
-            //        gridShader.SetVec3("color", mesh.color);
-            //        GL.UseProgram(gridShader.GetHandle());
-            //        GL.BindVertexArray(mesh.VertexArrayObject);
-            //        GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
-            //    }
-                
-            //}
-
-
-            foreach (CalculationMesh mesh in meshes)
+            foreach (Mesh mesh in meshes)
             {
                 shader.SetMatrix4("model", Matrix4.Identity);
-                shader.SetVec3("color", mesh.color);
-                if (mesh.renderType == RenderType.TRIANGLES)
-                {
-                    shader.Use();
-                    if (mesh.indexed)
-                    {
+                DrawMesh(shader, mesh);
 
-                        shader.SetInt("type", mesh.shaderType);
-                        if (mesh.meshType == MeshType.TEXTURED)
-                            mesh.texture.Use(TextureUnit.Texture0);
-                        GL.BindVertexArray(mesh.VertexArrayObject);
-                        GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
-                    }
-                    else
-                    {
-                        shader.SetInt("type", mesh.shaderType);
-                        if (mesh.meshType == MeshType.TEXTURED)
-                            mesh.texture.Use(TextureUnit.Texture0);
-                        GL.BindVertexArray(mesh.VertexArrayObject);
-                        GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.numVerts);
-                    }
-                }
-                else if (mesh.renderType == RenderType.LINES)
-                {
-                    //gridShader.Use();
-                    gridShader.SetVec3("color", mesh.color);
-                    GL.UseProgram(gridShader.GetHandle());
-                    GL.BindVertexArray(mesh.VertexArrayObject);
-                    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
-                }
-
+            }
+            foreach (CalculationMesh mesh in calculationMeshes)
+            {
+                shader.SetMatrix4("model", Matrix4.Identity);
+                DrawMesh(shader, mesh);
 
                 if(mesh.gridMesh != null)
                 {
@@ -219,43 +160,53 @@ namespace OpenTKCalculator
             foreach (Entity entity in entities)
             {
                 shader.SetMatrix4("model", entity.model);
-                shader.SetVec3("color", entity.mesh.color);
-                if (entity.mesh.renderType == RenderType.TRIANGLES)
-                {
-                    shader.Use();
-                    if (entity.mesh.indexed)
-                    {
-
-                        shader.SetInt("type", entity.mesh.shaderType);
-                        if(entity.mesh.meshType == MeshType.TEXTURED)
-                            entity.mesh.texture.Use(TextureUnit.Texture0);
-                        GL.BindVertexArray(entity.mesh.VertexArrayObject);
-                        GL.DrawElements(PrimitiveType.Triangles, entity.mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
-                    }
-                    else
-                    {
-                        shader.SetInt("type", entity.mesh.shaderType);
-                        if (entity.mesh.meshType == MeshType.TEXTURED)
-                            entity.mesh.texture.Use(TextureUnit.Texture0);
-                        GL.BindVertexArray(entity.mesh.VertexArrayObject);
-                        GL.DrawArrays(PrimitiveType.Triangles, 0, entity.mesh.numVerts);
-                    }
-                }
-                else if (entity.mesh.renderType == RenderType.LINES)
-                {
-                    shader.Use();
-                    shader.SetVec3("color", entity.mesh.color);
-                    shader.SetInt("type", entity.mesh.shaderType);
-                    GL.BindVertexArray(entity.mesh.VertexArrayObject);
-                    GL.DrawArrays(PrimitiveType.Lines, 0, entity.mesh.numVerts);
-                }
+                DrawMesh(shader, entity.mesh);
             }
 
             glControl.SwapBuffers();    // Display the result.
             glControl.Invalidate();
         }
 
-        public void AddMesh(CalculationMesh mesh)
+        private void DrawMesh(Shader shader, Mesh mesh)
+        {
+            shader.SetVec3("color", mesh.color);
+            if (mesh.renderType == RenderType.TRIANGLES)
+            {
+                shader.Use();
+                if (mesh.indexed)
+                {
+
+                    shader.SetInt("type", mesh.shaderType);
+                    if (mesh.meshType == MeshType.TEXTURED)
+                        mesh.texture.Use(TextureUnit.Texture0);
+                    GL.BindVertexArray(mesh.VertexArrayObject);
+                    GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+                }
+                else
+                {
+                    shader.SetInt("type", mesh.shaderType);
+                    if (mesh.meshType == MeshType.TEXTURED)
+                        mesh.texture.Use(TextureUnit.Texture0);
+                    GL.BindVertexArray(mesh.VertexArrayObject);
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.numVerts);
+                }
+            }
+            else if (mesh.renderType == RenderType.LINES)
+            {
+                //gridShader.Use();
+                gridShader.SetVec3("color", mesh.color);
+                GL.UseProgram(gridShader.GetHandle());
+                GL.BindVertexArray(mesh.VertexArrayObject);
+                GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
+            }
+        }
+
+        public void AddCalculationMesh(CalculationMesh mesh)
+        {
+            calculationMeshes.Add(mesh);
+        }
+
+        public void AddMesh(Mesh mesh)
         {
             meshes.Add(mesh);
         }
@@ -265,11 +216,13 @@ namespace OpenTKCalculator
             entities.Add(entity);
         }
 
-        public void OnQuit()
+
+
+        public void Dispose()
         {
             shader.Dispose();
-            foreach (Mesh mesh in meshes)
-                mesh.OnDelete();
+            foreach (Mesh mesh in calculationMeshes)
+                mesh.Dispose();
         }
     }
 }

@@ -32,6 +32,7 @@ namespace OpenTKCalculator
         {
             base.OnLoad(e);
 
+            StaticVertices.SetVertices();
             renderer = new Renderer();
             interpreter = new Interpreter();
             renderer.Initialize(glControl1);
@@ -58,23 +59,19 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            //Mesh gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.StaticDraw);
-            //gridMesh.color = new Vector3(1, 0, 0);
-            //renderer.AddMesh(gridMesh);
+            //dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -10, -10, 10, 10);
+            //for (int i = 0; i < dynMeshes.Length; i++)
+            //{
+            //    renderer.AddCalculationMesh(dynMeshes[i]);
+            //}
 
-            dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
-            for(int i =0;i<dynMeshes.Length; i++)
-            {
-                renderer.AddMesh(dynMeshes[i]);
-            }
-            Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression("0"))));
-            //dynMesh = CalculationMesh.GenerateCalculationMesh(-50, 50, -50, 50);
-            //renderer.AddMesh(dynMesh);
-            //Entity dynMeshEntity = new Entity(new Vector3(0, 0, 0), new Vector3(5, 0, 5), new Quaternion(new Vector3(0.35f, 0, 0)));
-            // dynMeshEntity.mesh = dynMesh;
-            //dynMesh.color = new Vector3(0, 1, 1);
-            // renderer.AddEntity(dynMeshEntity);
-            // renderer.AddMesh(dynMesh);
+
+
+            Mesh mesh = new Mesh(StaticVertices.cylinderVertices, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
+            //Entity entity = new Entity(new Vector3(), new Vector3(3,1, 1), new Quaternion(new Vector3()));
+             //entity.mesh = mesh;
+            // renderer.AddEntity(entity);
+            renderer.AddMesh(mesh);
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -85,7 +82,7 @@ namespace OpenTKCalculator
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            renderer.OnQuit();
+            renderer.Dispose();
         }
         
         protected override void OnKeyDown(KeyEventArgs e)

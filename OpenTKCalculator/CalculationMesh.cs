@@ -229,7 +229,7 @@ namespace OpenTKCalculator
             cMesh.zStart = zStart;
             cMesh.zEnd = zEnd;
 
-            cMesh.gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.DynamicDraw);
+            cMesh.gridMesh = new Mesh(gridVerts.ToArray(), MeshType.COLORED, RenderType.LINES, BufferUsageHint.DynamicDraw, false);
             return cMesh;
         }
 
