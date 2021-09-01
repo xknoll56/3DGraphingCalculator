@@ -46,20 +46,23 @@ namespace OpenTKCalculator
                 UpdateModel();
             }
         }
-        public Vector4 color { get; set; }
+        public Vector3 color { get; set; }
         public Matrix4 model { get; private set; }
         private Matrix4 translationMatrix;
         private Matrix4 scaleMatrix;
         private Matrix4 rotationMatrix;
 
         public Mesh mesh { get; set; }
+        public List<Entity> children;
 
         public Entity(Vector3 position, Vector3 scale, Quaternion rotation)
         {
             this.position = position;
             this.scale = scale;
             this.rotation = rotation;
+            color = new Vector3(1, 1, 1);
             UpdateModel();
+            children = new List<Entity>();
         }
 
         public Entity(Mesh mesh, Vector3 position, Vector3 scale, Quaternion rotation)
@@ -68,7 +71,9 @@ namespace OpenTKCalculator
             this.position = position;
             this.scale = scale;
             this.rotation = rotation;
+            color = new Vector3(1, 1, 1);
             UpdateModel();
+            children = new List<Entity>();
         }
 
         public void UpdateModel()

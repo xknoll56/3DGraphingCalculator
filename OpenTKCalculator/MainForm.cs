@@ -68,10 +68,20 @@ namespace OpenTKCalculator
 
 
             Mesh mesh = new Mesh(StaticVertices.cylinderVertices, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
-            //Entity entity = new Entity(new Vector3(), new Vector3(3,1, 1), new Quaternion(new Vector3()));
-             //entity.mesh = mesh;
-            // renderer.AddEntity(entity);
-            renderer.AddMesh(mesh);
+
+            Entity parent = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
+
+            Entity entity = new Entity(new Vector3(), new Vector3(0.25f,1, 0.25f), new Quaternion(new Vector3()));
+            entity.mesh = mesh;
+            entity.color = new Vector3(1, 0, 0);
+            parent.children.Add(entity);
+
+            Entity entity2 = new Entity(new Vector3(0, -0.5f, 0), new Vector3(0.25f, 1, 0.25f), new Quaternion(new Vector3((float)Math.PI*0.5f, 0, 0)));
+            entity2.mesh = mesh;
+            entity2.color = new Vector3(0, 1, 0);
+            parent.children.Add(entity2);
+            renderer.AddEntity(parent);
+            //renderer.AddMesh(mesh);
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)

@@ -21,7 +21,7 @@ namespace OpenTKCalculator
         private Camera mainCamera;
         private List<CalculationMesh> calculationMeshes;
         private List<Mesh> meshes;
-        private List<Entity> entities;
+        private List<Entity> parentEntities;
         Vector3 rotationTest = new Vector3();
         public bool canControl { get; set; }
         public bool Initialize(GLControl gLControl)
@@ -61,7 +61,7 @@ namespace OpenTKCalculator
             stopwatch.Start();
             calculationMeshes = new List<CalculationMesh>();
             meshes = new List<Mesh>();
-            entities = new List<Entity>();
+            parentEntities = new List<Entity>();
             canControl = false;
 
             return true;
@@ -157,14 +157,34 @@ namespace OpenTKCalculator
             }
 
 
-            foreach (Entity entity in entities)
+            foreach (Entity entity in parentEntities)
             {
-                shader.SetMatrix4("model", entity.model);
-                DrawMesh(shader, entity.mesh);
+                DrawEntity(entity);
             }
 
             glControl.SwapBuffers();    // Display the result.
             glControl.Invalidate();
+        }
+
+        private void DrawEntity(Entity entity)
+        {
+            Matrix4 model = entity.model;
+            shader.SetVec3("color", entity.color);
+            shader.SetMatrix4("model", model);
+            if(entity.mesh!=null)
+                DrawMesh(shader, entity.mesh, entity.color);
+            foreach (Entity child in entity.children)
+                DrawChildrenEntities(ref model, child);
+        }
+        private void DrawChildrenEntities(ref Matrix4 parentTransform, Entity entity)
+        {
+            Matrix4 trans = parentTransform * entity.model;
+            shader.SetVec3("color", entity.color);
+            shader.SetMatrix4("model", trans);
+            if (entity.mesh != null)
+                DrawMesh(shader, entity.mesh, entity.color);
+            foreach (Entity child in entity.children)
+                DrawChildrenEntities(ref trans, child);
         }
 
         private void DrawMesh(Shader shader, Mesh mesh)
@@ -201,6 +221,40 @@ namespace OpenTKCalculator
             }
         }
 
+
+        private void DrawMesh(Shader shader, Mesh mesh, Vector3 color)
+        {
+            shader.SetVec3("color", color);
+            if (mesh.renderType == RenderType.TRIANGLES)
+            {
+                shader.Use();
+                if (mesh.indexed)
+                {
+
+                    shader.SetInt("type", mesh.shaderType);
+                    if (mesh.meshType == MeshType.TEXTURED)
+                        mesh.texture.Use(TextureUnit.Texture0);
+                    GL.BindVertexArray(mesh.VertexArrayObject);
+                    GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+                }
+                else
+                {
+                    shader.SetInt("type", mesh.shaderType);
+                    if (mesh.meshType == MeshType.TEXTURED)
+                        mesh.texture.Use(TextureUnit.Texture0);
+                    GL.BindVertexArray(mesh.VertexArrayObject);
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.numVerts);
+                }
+            }
+            else if (mesh.renderType == RenderType.LINES)
+            {
+                gridShader.SetVec3("color", color);
+                GL.UseProgram(gridShader.GetHandle());
+                GL.BindVertexArray(mesh.VertexArrayObject);
+                GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
+            }
+        }
+
         public void AddCalculationMesh(CalculationMesh mesh)
         {
             calculationMeshes.Add(mesh);
@@ -213,7 +267,7 @@ namespace OpenTKCalculator
 
         public void AddEntity(Entity entity)
         {
-            entities.Add(entity);
+            parentEntities.Add(entity);
         }
 
 
