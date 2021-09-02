@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OpenTKCalculator
@@ -90,22 +91,23 @@ namespace OpenTKCalculator
     }
     class Tokenizer
     {
-        public List<Token> tokens { get; }
+        private List<Token> tokens;
+        public List<Token> Tokens { get => tokens.ToList(); }
         private String operators = "+-*/()^÷x";
         private List<String> functions =
         new List<string>(){
-            "Sin",
-            "Cos",
-            "Tan",
-            "Asin",
-            "Acos",
-            "Atan",
-            "Ln",
-            "Log",
-            "Log2",
-            "Abs",
-            "Min",
-            "Max"
+            "sin",
+            "cos",
+            "yan",
+            "asin",
+            "acos",
+            "atan",
+            "ln",
+            "log",
+            "log2",
+            "abs",
+            "min",
+            "max"
         };
 
         public Tokenizer()
@@ -156,8 +158,10 @@ namespace OpenTKCalculator
                     case ReadingType.FUNCTION:
                         if (!Char.IsLetter(c))
                         {
-                            if(functions.Contains(token))
+                            if (functions.Contains(token))
                                 tokens.Add(new Token(token));
+                            else
+                                throw new Exception("Invalid function \""+token+"\"");
                             token = "";
                             i--;
                             reading = ReadingType.NONE;
@@ -178,7 +182,7 @@ namespace OpenTKCalculator
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine("Failed");
+                                throw new Exception("invalid number parsig");
                             }
                             token = "";
                             i--;
@@ -204,7 +208,7 @@ namespace OpenTKCalculator
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Failed to read number");
+                        throw new Exception("invalid number parsig");
                     }
                     break;
                 case ReadingType.FUNCTION:

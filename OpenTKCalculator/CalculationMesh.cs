@@ -322,17 +322,17 @@ namespace OpenTKCalculator
 
         //}
 
-        public async Task UpdateExpression(string expression)
+        public async Task UpdateExpression(List<Token> tokens)
         {
             for (uint ind = 0; ind < vertices.Length; ind += 3)
             {
-                vertices[ind + 1] = interpreter.EvaluateExpression(expression, vertices[ind], vertices[ind + 2]);
+                vertices[ind + 1] = interpreter.EvaluateExpression(tokens.ToList(), vertices[ind], vertices[ind + 2]);
             }
             if(gridMesh != null)
             {
                 for (uint ind = 0; ind < gridMesh.vertices.Length; ind += 3)
                 {
-                    gridMesh.vertices[ind + 1] = interpreter.EvaluateExpression(expression, gridMesh.vertices[ind], gridMesh.vertices[ind + 2]);
+                    gridMesh.vertices[ind + 1] = interpreter.EvaluateExpression(tokens.ToList(), gridMesh.vertices[ind], gridMesh.vertices[ind + 2]);
                     gridMesh.vertices[ind + 1] += gridLineOffset;
                 }
             }

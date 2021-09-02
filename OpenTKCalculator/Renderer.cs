@@ -34,8 +34,8 @@ namespace OpenTKCalculator
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Blend);
-            GL.Enable(EnableCap.LineSmooth);
-            GL.LineWidth(2.5f);
+           // GL.Enable(EnableCap.LineSmooth);
+           // GL.LineWidth(2.5f);
             //GL.Enable(EnableCap.CullFace);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             //GL.Hint(HintTarget.)
@@ -49,7 +49,6 @@ namespace OpenTKCalculator
             gridShader = new Shader("Shaders/GridShader.vert", "Shaders/GridShader.frag");
 
             mainCamera = new Camera(new Vector3(0, 2, 5), glControl.AspectRatio);
-            mainCamera.Yaw = 10.0f;
             //mainCamera.Yaw = 0.23f;
             Matrix4 model = Matrix4.Identity;
             shader.SetMatrix4("model", model);
@@ -157,7 +156,7 @@ namespace OpenTKCalculator
             }
 
             // parentEntities[0].Rotation = new Quaternion(rotationTest);
-            parentEntities[0].Euler += new Vector3(0.25f * dt, dt, 0.5f * dt);
+            //parentEntities[0].Euler += new Vector3(0.25f * dt, dt, 0.5f * dt);
             foreach (Entity entity in parentEntities)
             {
                 DrawEntity(ref IDENTITY, entity);
