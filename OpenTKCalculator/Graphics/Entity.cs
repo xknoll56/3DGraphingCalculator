@@ -70,6 +70,16 @@ namespace OpenTKCalculator
         public Mesh mesh { get; set; }
         public List<Entity> children { get; private set; }
 
+        public Entity()
+        {
+            this.position = new Vector3();
+            this.scale = new Vector3(1, 1, 1);
+            this.rotation = new Quaternion(new Vector3());
+            color = new Vector3(1, 1, 1);
+            UpdateModel();
+            children = new List<Entity>();
+        }
+
         public Entity(Vector3 position, Vector3 scale, Quaternion rotation)
         {
             this.position = position;

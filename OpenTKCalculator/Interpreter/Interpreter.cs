@@ -16,7 +16,6 @@ namespace OpenTKCalculator
         private readonly Dictionary<string, int> functionArgs;
         private readonly Dictionary<string, Function1d> function1dDict;
         private readonly Dictionary<string, Function2d> function2dDict;
-        Exception parseException = null;
         Token openBrack;
         Token closedBrack;
 
@@ -36,21 +35,21 @@ namespace OpenTKCalculator
             operatorPrecidence.Add('(', 3);
             operatorPrecidence.Add(')', 3);
             functionArgs = new Dictionary<string, int>();
-            functionArgs.Add("Sin", 1);
-            functionArgs.Add("Cos", 1);
-            functionArgs.Add("Tan", 1);
-            functionArgs.Add("Ln", 1);
-            functionArgs.Add("Log2", 1);
-            functionArgs.Add("Abs", 1);
-            functionArgs.Add("Min", 2);
-            functionArgs.Add("Max", 2);
+            functionArgs.Add("sin", 1);
+            functionArgs.Add("cos", 1);
+            functionArgs.Add("tan", 1);
+            functionArgs.Add("ln", 1);
+            functionArgs.Add("log2", 1);
+            functionArgs.Add("abs", 1);
+            functionArgs.Add("min", 2);
+            functionArgs.Add("max", 2);
             function1dDict = new Dictionary<string, Function1d>();
             Function1d sinDel = Math.Sin; 
             Function1d cosDel = Math.Cos; 
             Function1d tanDel = Math.Tan;
-            function1dDict.Add("Sin", sinDel);
-            function1dDict.Add("Cos", cosDel);
-            function1dDict.Add("Tan", tanDel);
+            function1dDict.Add("sin", sinDel);
+            function1dDict.Add("cos", cosDel);
+            function1dDict.Add("tan", tanDel);
             //functionDict.Add("Ln", 1);
             //functionDict.Add("Log2", 1);
             //functionDict.Add("Abs", 1);
@@ -90,39 +89,24 @@ namespace OpenTKCalculator
             }
         }
 
-        public float EvaluateExpression(string expression)
+        public float EvaluateExpression(List<Token> tokens)
         {
-            tokenizer.TokenizeExpression(expression);
-            List<Token> tokens = tokenizer.tokens;
-            parseException = null;
-
-
-            if(tokens.FindAll(new Predicate<Token>(FindOpenBrackets)).Count != tokens.FindAll(new Predicate<Token>(FindClosedBrackets)).Count)
-            {
-                parseException = new Exception("Invalid bracketing");
-                return float.NaN;
-            }
-            return (float)EvaluateExpressionRecursive(tokens.ToArray());
-
+            return EvaluateExpression(tokens, 0, 0);
         }
 
-        public float EvaluateExpression(string expression, double x, double y)
+        public float EvaluateExpression(List<Token> tokens, double x, double y)
         {
-            tokenizer.TokenizeExpression(expression);
-            List<Token> tokens = tokenizer.tokens;
             ReplaceAllVariables(tokens, x, y);
-            parseException = null;
 
             if (tokens.FindAll(new Predicate<Token>(FindOpenBrackets)).Count != tokens.FindAll(new Predicate<Token>(FindClosedBrackets)).Count)
             {
-                parseException = new Exception("Invalid bracketing");
-                return float.NaN;
+                throw new Exception("Invalid bracketing");
             }
             return (float)EvaluateExpressionRecursive(tokens.ToArray());
 
         }
 
-        public double EvaluateExpressionRecursive(Token[] tokens)
+        private double EvaluateExpressionRecursive(Token[] tokens)
         {
             Stack<Token> operatorStack = new Stack<Token>();
             Stack<Token> operandStack = new Stack<Token>();
@@ -165,6 +149,11 @@ namespace OpenTKCalculator
                         operatorStack.Push(tok);
                         break;
                     case TokenType.NUMBER:
+                        if(i<tokens.Length-2)
+                        {
+                            if (tokens[i + 1].type != TokenType.OPERATOR)
+                                throw new Exception("evaluated chain not followed by proper sequence of operators.");
+                        }
                         operandStack.Push(tok);
                         break;
                     case TokenType.FUNCTION:
@@ -175,8 +164,6 @@ namespace OpenTKCalculator
                 }
             }
 
-            if (parseException == null)
-            {
                 Token token;
                 while (operatorStack.TryPeek(out token))
                 {
@@ -184,9 +171,7 @@ namespace OpenTKCalculator
                 }
 
                 return operandStack.Pop().GetData<double>();
-            }
-            else
-                return double.NaN;
+
         }
 
         private Token[] EvaluateSubExpression(Token[] tokens, Token openingBracket)
@@ -221,8 +206,7 @@ namespace OpenTKCalculator
                     }
                     else if (token.type == TokenType.EOF)
                     {
-                        parseException = new Exception("Invalid bracketing");
-                        modifiedTokens = new List<Token>();
+                        throw new Exception("Invalid bracketing");
                         break;
                     }
 
@@ -287,8 +271,7 @@ namespace OpenTKCalculator
                     }
                     else if (token.type == TokenType.EOF)
                     {
-                        parseException = new Exception("Invalid bracketing");
-                        modifiedTokens = new List<Token>();
+                        throw new Exception("Invalid bracketing");
                         break;
                     }
 
@@ -322,7 +305,7 @@ namespace OpenTKCalculator
                     return function2dDict[func](arguments[0], arguments[1]);
             }
 
-            parseException = new Exception("Function not found.");
+            throw new Exception("Function not found.");
             return 0;
         }
 

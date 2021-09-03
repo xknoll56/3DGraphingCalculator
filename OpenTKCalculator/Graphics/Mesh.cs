@@ -407,7 +407,8 @@ namespace OpenTKCalculator
 
             for (int i = 0; i < points; i++)
             {
-                float  theta = 2.0f * (float)Math.PI * (i) / points;
+
+                float theta = 2.0f * (float)Math.PI * (i) / points;
                 vertices.Add(0.5f * (float)Math.Cos(theta));
                 vertices.Add(0.5f);
                 vertices.Add(0.5f * (float)Math.Sin(theta));

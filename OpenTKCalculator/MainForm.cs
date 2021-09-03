@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using OpenTK;
 using System.Diagnostics;
 using OpenTK.Graphics;
+using System.Threading;
 
 namespace OpenTKCalculator
 {
@@ -19,9 +20,11 @@ namespace OpenTKCalculator
     {
 
         Renderer renderer;
-        //Tokenizer tokenizer;
         Interpreter interpreter;
+        Tokenizer tokenizer;
         CalculationMesh[] dynMeshes;
+        Entity unitDirs;
+        Mutex evaluationMutex;
         public MainForm()
         {
             InitializeComponent();
@@ -35,6 +38,8 @@ namespace OpenTKCalculator
             StaticVertices.SetVertices();
             renderer = new Renderer();
             interpreter = new Interpreter();
+            tokenizer = new Tokenizer();
+            evaluationMutex = new Mutex();
             renderer.Initialize(glControl1);
 
 
@@ -59,7 +64,7 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            //dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -10, -10, 10, 10);
+            //dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
             //for (int i = 0; i < dynMeshes.Length; i++)
             //{
             //    renderer.AddCalculationMesh(dynMeshes[i]);
@@ -69,11 +74,11 @@ namespace OpenTKCalculator
 
             Mesh mesh = new Mesh(StaticVertices.cylinderVertices, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
 
-            Entity unitDirs = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
+            unitDirs = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
 
-            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.25f,5, 0.25f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
+            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
             entity.mesh = mesh;
-            entity.color = new Vector3(1, 0, 0);
+            entity.color = new Vector3(0, 0, 1);
             unitDirs.AddChild(entity);
 
             Entity entity2 = new Entity(new Vector3(0, 2.5f, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, 0)));
@@ -83,10 +88,11 @@ namespace OpenTKCalculator
 
             Entity entity3 = new Entity(new Vector3(2.5f, 0, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, (float)Math.PI * 0.5f)));
             entity3.mesh = mesh;
-            entity3.color = new Vector3(0, 0, 1);
+            entity3.color = new Vector3(1, 0, 0);
             unitDirs.AddChild(entity3);
 
             renderer.AddEntity(unitDirs);
+
             //renderer.AddMesh(mesh);
         }
 
@@ -160,16 +166,30 @@ namespace OpenTKCalculator
         {
             if(e.KeyCode == Keys.Enter)
             {
-                var watch = new Stopwatch();
-                watch.Start();
-                await Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression(expressionTextBox.Text))));
-                watch.Stop();
-                Console.WriteLine(watch.ElapsedMilliseconds);
-
-                for (int i = 0; i < dynMeshes.Length; i++)
+                evaluationMutex.WaitOne();
+                try
                 {
-                    dynMeshes[i].UpdateBuffers();
+                    tokenizer.TokenizeExpression(expressionTextBox.Text);
+                    //try to interpret the expression to ensure no errors a had
+                    interpreter.EvaluateExpression(tokenizer.Tokens);
+                    var watch = new Stopwatch();
+                    watch.Start();
+                    await Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression(tokenizer.Tokens))));
+                    watch.Stop();
+                    Console.WriteLine(watch.ElapsedMilliseconds);
+
+                    float z = interpreter.EvaluateExpression(tokenizer.Tokens, 0, 0);
+                    unitDirs.Position = new Vector3(0, z, 0);
+                    for (int i = 0; i < dynMeshes.Length; i++)
+                    {
+                        dynMeshes[i].UpdateBuffers();
+                    }
                 }
+                catch(Exception exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+                evaluationMutex.ReleaseMutex();
             }
         }
     }
