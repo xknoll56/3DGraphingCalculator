@@ -18,12 +18,10 @@ namespace OpenTKCalculator
 {
     public partial class MainForm : Form
     {
-
-        Renderer renderer;
         Interpreter interpreter;
         Tokenizer tokenizer;
-        CalculationMesh[] dynMeshes;
-        Entity unitDirs;
+        //CalculationMesh[] dynMeshes;
+        CalculationGrid grid;
         Mutex evaluationMutex;
         public MainForm()
         {
@@ -35,12 +33,12 @@ namespace OpenTKCalculator
         {
             base.OnLoad(e);
 
-            StaticVertices.SetVertices();
-            renderer = new Renderer();
+            
+            Renderer.instance = new Renderer();
             interpreter = new Interpreter();
             tokenizer = new Tokenizer();
             evaluationMutex = new Mutex();
-            renderer.Initialize(glControl1);
+            Renderer.instance.Initialize(glControl1);
 
 
             List<float> gridVerts = new List<float>();
@@ -69,31 +67,11 @@ namespace OpenTKCalculator
             //{
             //    renderer.AddCalculationMesh(dynMeshes[i]);
             //}
+            grid = new CalculationGrid();
+            hScrollBar1.Maximum = 100;
+            hScrollBar1.Minimum = 10;
+            listBox1.Items.Add(grid);
 
-
-
-            Mesh mesh = new Mesh(StaticVertices.cylinderVertices, MeshType.COLORED, RenderType.TRIANGLES, BufferUsageHint.StaticDraw, true);
-
-            unitDirs = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
-
-            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
-            entity.mesh = mesh;
-            entity.color = new Vector3(0, 0, 1);
-            unitDirs.AddChild(entity);
-
-            Entity entity2 = new Entity(new Vector3(0, 2.5f, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, 0)));
-            entity2.mesh = mesh;
-            entity2.color = new Vector3(0, 1, 0);
-            unitDirs.AddChild(entity2);
-
-            Entity entity3 = new Entity(new Vector3(2.5f, 0, 0), new Vector3(0.25f, 5, 0.25f), new Quaternion(new Vector3(0, 0, (float)Math.PI * 0.5f)));
-            entity3.mesh = mesh;
-            entity3.color = new Vector3(1, 0, 0);
-            unitDirs.AddChild(entity3);
-
-            renderer.AddEntity(unitDirs);
-
-            //renderer.AddMesh(mesh);
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -104,7 +82,7 @@ namespace OpenTKCalculator
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            renderer.Dispose();
+            Renderer.instance.Dispose();
         }
         
         protected override void OnKeyDown(KeyEventArgs e)
@@ -139,7 +117,7 @@ namespace OpenTKCalculator
                 Input.prevMousePos.Y = Input.mouseInput.Y;
                 Cursor.Hide();
                 Input.initMousePos = Cursor.Position;
-                renderer.canControl = true;
+                Renderer.instance.canControl = true;
             }
             if (e.Button == MouseButtons.Right)
                 Input.mouse[1] = true;
@@ -154,7 +132,7 @@ namespace OpenTKCalculator
                 Input.mouse[0] = false;
                 Cursor.Show();
                 Cursor.Position = Input.initMousePos;
-                renderer.canControl = false;
+                Renderer.instance.canControl = false;
             }
             if (e.Button == MouseButtons.Right)
                 Input.mouse[1] = false;
@@ -172,18 +150,8 @@ namespace OpenTKCalculator
                     tokenizer.TokenizeExpression(expressionTextBox.Text);
                     //try to interpret the expression to ensure no errors a had
                     interpreter.EvaluateExpression(tokenizer.Tokens);
-                    var watch = new Stopwatch();
-                    watch.Start();
-                    await Task.WhenAll(dynMeshes.Select(data => Task.Run(() => data.UpdateExpression(tokenizer.Tokens))));
-                    watch.Stop();
-                    Console.WriteLine(watch.ElapsedMilliseconds);
-
-                    float z = interpreter.EvaluateExpression(tokenizer.Tokens, 0, 0);
-                    unitDirs.Position = new Vector3(0, z, 0);
-                    for (int i = 0; i < dynMeshes.Length; i++)
-                    {
-                        dynMeshes[i].UpdateBuffers();
-                    }
+                    grid.UpdateExpression(expressionTextBox.Text, tokenizer.Tokens, interpreter);
+                    listBox1.SelectedItem = grid;
                 }
                 catch(Exception exception)
                 {
@@ -191,6 +159,12 @@ namespace OpenTKCalculator
                 }
                 evaluationMutex.ReleaseMutex();
             }
+        }
+
+        private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
+        {
+            float s =10.0f*(float)(hScrollBar1.Value ) / hScrollBar1.Maximum;
+            grid.parent.Scale = new Vector3(s, s, s);
         }
     }
 }

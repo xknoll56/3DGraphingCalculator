@@ -473,11 +473,32 @@ namespace OpenTKCalculator
                 vertices.Add(0.5f * (float)Math.Sin(theta));
             }
             cylinderVertices = vertices.ToArray();
+
+            vertices = new List<float>();
+            for (int i = 0; i < points; i++)
+            {
+
+                float theta = 2.0f * (float)Math.PI * (i) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+
+                vertices.Add(0);
+                vertices.Add(0.5f);
+                vertices.Add(0);
+
+                theta = 2.0f * (float)Math.PI * (i + 1) / points;
+                vertices.Add(0.5f * (float)Math.Cos(theta));
+                vertices.Add(-0.5f);
+                vertices.Add(0.5f * (float)Math.Sin(theta));
+            }
+            coneVertices = vertices.ToArray();
         }
 
         public static float[] cylinderVertices = new float[1080];
         public static float[] circleVertices = new float[93];
         public static uint[] circleIndices = new uint[90];
+        public static float[] coneVertices = new float[270];
         public static float[] vertices = {
              0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,  // top right
              0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom right

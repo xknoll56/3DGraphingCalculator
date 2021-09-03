@@ -233,7 +233,7 @@ namespace OpenTKCalculator
             return cMesh;
         }
 
-        public static CalculationMesh[] GenerateCalculationMeshGrid(uint fidelity = 10, int xStart = -50, int zStart = -50, int xEnd = 50, int zEnd = 50)
+        public static CalculationMesh[] GenerateCalculationMeshGrid(uint fidelity = 10, int xStart = -10, int zStart = -10, int xEnd = 10, int zEnd = 10)
         {
 
 

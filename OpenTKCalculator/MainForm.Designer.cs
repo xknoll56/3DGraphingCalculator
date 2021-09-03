@@ -29,11 +29,12 @@ namespace OpenTKCalculator
         /// </summary>
         private void InitializeComponent()
         {
-            this.glControl1 = new OpenTK.GLControl(OpenTK.Graphics.GraphicsMode.Default, 4, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
+            this.glControl1 = new OpenTK.GLControl();
             this.expressionTextBox = new System.Windows.Forms.TextBox();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.hScrollBar1 = new System.Windows.Forms.HScrollBar();
             this.SuspendLayout();
             // 
             // glControl1
@@ -53,7 +54,7 @@ namespace OpenTKCalculator
             // 
             this.expressionTextBox.BackColor = System.Drawing.SystemColors.WindowFrame;
             this.expressionTextBox.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.expressionTextBox.Location = new System.Drawing.Point(946, 36);
+            this.expressionTextBox.Location = new System.Drawing.Point(928, 36);
             this.expressionTextBox.Name = "expressionTextBox";
             this.expressionTextBox.Size = new System.Drawing.Size(322, 27);
             this.expressionTextBox.TabIndex = 1;
@@ -88,12 +89,21 @@ namespace OpenTKCalculator
             this.label2.TabIndex = 4;
             this.label2.Text = "Meshes";
             // 
+            // hScrollBar1
+            // 
+            this.hScrollBar1.Location = new System.Drawing.Point(928, 88);
+            this.hScrollBar1.Name = "hScrollBar1";
+            this.hScrollBar1.Size = new System.Drawing.Size(321, 26);
+            this.hScrollBar1.TabIndex = 5;
+            this.hScrollBar1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar1_Scroll);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.ClientSize = new System.Drawing.Size(1262, 673);
+            this.Controls.Add(this.hScrollBar1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox1);
@@ -115,6 +125,7 @@ namespace OpenTKCalculator
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.HScrollBar hScrollBar1;
     }
 }
 

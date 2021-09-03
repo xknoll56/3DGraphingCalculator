@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace OpenTKCalculator
 {
-    class Renderer: IDisposable
+    class Renderer : IDisposable
     {
         private GLControl glControl;
         private Stopwatch stopwatch;
@@ -24,6 +24,8 @@ namespace OpenTKCalculator
         private List<Entity> parentEntities;
         private Matrix4 IDENTITY = Matrix4.Identity;
         public bool canControl { get; set; }
+
+        public static Renderer instance;
         public bool Initialize(GLControl gLControl)
         {
             this.glControl = gLControl;
@@ -31,12 +33,13 @@ namespace OpenTKCalculator
             // You can bind the events here or in the Designer.
             glControl.Resize += OnResize;
             glControl.Paint += OnPaint;
+            StaticVertices.SetVertices();
             GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.RescaleNormal);
-           // GL.Enable(EnableCap.LineSmooth);
-           // GL.LineWidth(2.5f);
+            // GL.Enable(EnableCap.LineSmooth);
+            // GL.LineWidth(2.5f);
             //GL.Enable(EnableCap.CullFace);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             //GL.Hint(HintTarget.)
@@ -145,19 +148,10 @@ namespace OpenTKCalculator
             {
                 shader.SetMatrix4("model", Matrix4.Identity);
                 DrawMesh(shader, mesh, mesh.color);
-
-                if(mesh.gridMesh != null)
-                {
-                    gridShader.SetVec3("color", new Vector3(1,0,0));
-                    GL.UseProgram(gridShader.GetHandle());
-                    GL.BindVertexArray(mesh.gridMesh.VertexArrayObject);
-                    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.gridMesh.numVerts);
-                }
-
             }
 
             // parentEntities[0].Rotation = new Quaternion(rotationTest);
-            parentEntities[0].Euler += new Vector3(0, 0.25f*dt, 0);
+            //parentEntities[0].Euler += new Vector3(0, 0.25f*dt, 0);
             foreach (Entity entity in parentEntities)
             {
                 DrawEntity(ref IDENTITY, entity);
@@ -169,15 +163,23 @@ namespace OpenTKCalculator
 
         private void DrawEntity(ref Matrix4 parentTransform, Entity entity)
         {
-            Matrix4 trans = entity.model*parentTransform;
+            Matrix4 trans = entity.model * parentTransform;
             shader.SetVec3("color", entity.color);
             shader.SetMatrix4("model", trans);
+            gridShader.SetMatrix4("model", trans);
             if (entity.mesh != null)
                 DrawMesh(shader, entity.mesh, entity.color);
             foreach (Entity child in entity.children)
                 DrawEntity(ref trans, child);
         }
 
+        private void DrawGrid(Shader shader, Mesh mesh)
+        {
+            gridShader.SetVec3("color", new Vector3(1, 0, 0));
+            GL.UseProgram(gridShader.GetHandle());
+            GL.BindVertexArray(mesh.VertexArrayObject);
+            GL.DrawArrays(PrimitiveType.Lines, 0, mesh.numVerts);
+        }
         private void DrawMesh(Shader shader, Mesh mesh, Vector3 color)
         {
             shader.SetVec3("color", color);
