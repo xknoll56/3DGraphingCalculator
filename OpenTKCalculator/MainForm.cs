@@ -64,11 +64,11 @@ namespace OpenTKCalculator
                 gridVerts.Add(i);
             }
 
-            dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
-            for (int i = 0; i < dynMeshes.Length; i++)
-            {
-                renderer.AddCalculationMesh(dynMeshes[i]);
-            }
+            //dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
+            //for (int i = 0; i < dynMeshes.Length; i++)
+            //{
+            //    renderer.AddCalculationMesh(dynMeshes[i]);
+            //}
 
 
 
@@ -76,7 +76,7 @@ namespace OpenTKCalculator
 
             unitDirs = new Entity(new Vector3(), new Vector3(1, 1, 1), new Quaternion(new Vector3()));
 
-            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.35f,5, 0.35f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
+            Entity entity = new Entity(new Vector3(0, 0, 2.5f), new Vector3(0.35f, 5, 0.35f), new Quaternion(new Vector3((float)Math.PI * 0.5f, 0, 0)));
             entity.mesh = mesh;
             entity.color = new Vector3(0, 0, 1);
             unitDirs.AddChild(entity);
@@ -92,6 +92,7 @@ namespace OpenTKCalculator
             unitDirs.AddChild(entity3);
 
             renderer.AddEntity(unitDirs);
+
             //renderer.AddMesh(mesh);
         }
 
