@@ -23,6 +23,11 @@ namespace OpenTKCalculator
         //CalculationMesh[] dynMeshes;
         CalculationGrid grid;
         Mutex evaluationMutex;
+        bool rotxPressed = false;
+        bool rotYPressed = false;
+        bool rotZPressed = false;
+        bool appRunning = false;
+        Stopwatch stopwatch;
         public MainForm()
         {
             InitializeComponent();
@@ -34,10 +39,12 @@ namespace OpenTKCalculator
             base.OnLoad(e);
 
             
+            appRunning = true;
             Renderer.instance = new Renderer();
             interpreter = new Interpreter();
             tokenizer = new Tokenizer();
             evaluationMutex = new Mutex();
+            stopwatch = new Stopwatch();
             Renderer.instance.Initialize(glControl1);
 
 
@@ -67,9 +74,7 @@ namespace OpenTKCalculator
             //{
             //    renderer.AddCalculationMesh(dynMeshes[i]);
             //}
-            grid = new CalculationGrid();
-            hScrollBar1.Maximum = 100;
-            hScrollBar1.Minimum = 10;
+            grid = new CalculationGrid(10, -10, -10, 10, 10);
             listBox1.Items.Add(grid);
 
         }
@@ -79,8 +84,9 @@ namespace OpenTKCalculator
             throw new NotImplementedException();
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {
+            appRunning = false;
             base.OnClosing(e);
             Renderer.instance.Dispose();
         }
@@ -163,8 +169,29 @@ namespace OpenTKCalculator
 
         private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
         {
-            float s =10.0f*(float)(hScrollBar1.Value ) / hScrollBar1.Maximum;
+            float s =10.0f*(float)(hScrollScale.Value ) / hScrollScale.Maximum;
             grid.parent.Scale = new Vector3(s, s, s);
+            this.Invalidate();
         }
+
+        private void vScrollRotX_Scroll(object sender, ScrollEventArgs e)
+        {
+            //float theta = (float)Math.PI * 2.0f * vScrollRotX.Value / vScrollRotX.Maximum;
+            //grid.parent.Euler = new Vector3(theta, grid.parent.Euler.Y, grid.parent.Euler.Z);
+        }
+
+        private void vScrollRotY_Scroll(object sender, ScrollEventArgs e)
+        {
+            //float theta = (float)Math.PI * 2.0f * vScrollRotY.Value / vScrollRotY.Maximum;
+           // grid.parent.Euler = new Vector3(grid.parent.Euler.X, theta, grid.parent.Euler.Z);
+        }
+
+        private void vScrollRotZ_Scroll(object sender, ScrollEventArgs e)
+        {
+           // float theta = (float)Math.PI * 2.0f * vScrollRotZ.Value / vScrollRotZ.Maximum;
+           // grid.parent.Euler = new Vector3(grid.parent.Euler.X, grid.parent.Euler.Y, theta);
+        }
+
+
     }
 }

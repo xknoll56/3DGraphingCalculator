@@ -97,7 +97,7 @@ namespace OpenTKCalculator
         }
 
 
-        public static CalculationMesh GenerateCalculationMeshWithGrid(float xStart, float xEnd, float zStart, float zEnd)
+        public static CalculationMesh GenerateCalculationMeshWithGrid(uint fidelity, float xStart, float xEnd, float zStart, float zEnd)
         {
 
             List<float> planeVerts = new List<float>();
@@ -105,7 +105,7 @@ namespace OpenTKCalculator
             List<float> gridVerts = new List<float>();
             //float xStart = -5, xEnd = 5;
             //float zStart = -5, zEnd = 5;
-            uint divisions = (uint)(0.5 * (Math.Abs(xEnd - xStart) * 10 + Math.Abs(zEnd - zStart) * 10));
+            uint divisions = (uint)(0.5 * (Math.Abs(xEnd - xStart) * fidelity + Math.Abs(zEnd - zStart) * fidelity));
             uint rows = 0, cols = 0;
             bool rowsSet = false;
             float dp = Math.Abs(xEnd - xStart) / divisions;
@@ -243,7 +243,7 @@ namespace OpenTKCalculator
             {
                 for (int zi = zStart; zi < zEnd; zi++)
                 {
-                    calculationMeshes[index++] = GenerateCalculationMeshWithGrid(xi, xi + 1, zi, zi + 1);
+                    calculationMeshes[index++] = GenerateCalculationMeshWithGrid(fidelity, xi, xi + 1, zi, zi + 1);
                 }
             }
 
