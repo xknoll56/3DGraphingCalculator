@@ -16,6 +16,7 @@ namespace OpenTKCalculator
         public Entity parent;
         public Entity unitDirs;
         private string expression;
+        private BufferUsageHint gridType;
 
 
         public CalculationGrid(uint fidelity = 10, int xStart = -10, int zStart = -10, int xEnd = 10, int zEnd = 10)
@@ -76,6 +77,18 @@ namespace OpenTKCalculator
             expression = "0";
         }
 
+        public static CalculationGrid GenerateCalculationGrid(BufferUsageHint bufferUsageHint, int xStart = -10, int zStart = -10, int xEnd = 10, int zEnd = 10)
+        {
+            switch(bufferUsageHint)
+            {
+                case BufferUsageHint.DynamicDraw:
+                    return new CalculationGrid(10, xStart, zStart, xEnd, zEnd);
+                case BufferUsageHint.StreamDraw:
+                    return new CalculationGrid(1, xStart, zStart, xEnd, zEnd);
+            }
+            throw new Exception();
+        }
+
         public async void UpdateExpression(string expression, List<Token> tokens, Interpreter interpreter)
         {
             var watch = new Stopwatch();
@@ -91,6 +104,28 @@ namespace OpenTKCalculator
                 calcMeshes[i].UpdateBuffers();
             }
             this.expression = expression;
+        }
+
+        public async void UpdateExpression(string expression, List<Token> tokens, Interpreter interpreter, double centroidX, double centroidZ)
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            await Task.WhenAll(calcMeshes.Select(data => Task.Run(() => data.UpdateExpression(tokens, centroidX, centroidZ))));
+            watch.Stop();
+            Console.WriteLine(watch.ElapsedMilliseconds);
+
+            float z = interpreter.EvaluateExpression(tokens, centroidX, centroidZ);
+            unitDirs.Position = new Vector3(0, z, 0);
+            for (int i = 0; i < calcMeshes.Length; i++)
+            {
+                calcMeshes[i].UpdateBuffers();
+            }
+            this.expression = expression;
+        }
+
+        public Vector3 GetCentroidPosition()
+        {
+            return unitDirs.Position;
         }
 
         public override string ToString()

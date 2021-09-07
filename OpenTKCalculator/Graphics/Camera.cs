@@ -4,6 +4,8 @@ using System;
 
 public class Camera
 {
+
+    public static Camera instance;
     // Those vectors are directions pointing outwards from the camera to define how it rotated.
     private Vector3 _front = -Vector3.UnitZ;
 

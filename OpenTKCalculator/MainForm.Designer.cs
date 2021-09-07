@@ -37,16 +37,21 @@ namespace OpenTKCalculator
             this.hScrollScale = new System.Windows.Forms.HScrollBar();
             this.numericUpDownRotX = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
-            this.vScrollBar2 = new System.Windows.Forms.VScrollBar();
-            this.vScrollBar3 = new System.Windows.Forms.VScrollBar();
+            this.numericUpDownRotY = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownRotZ = new System.Windows.Forms.NumericUpDown();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label5 = new System.Windows.Forms.Label();
+            this.buttonEvaluate = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.numericUpDownCentroidZ = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownCentroidX = new System.Windows.Forms.NumericUpDown();
+            this.buttonResetCamera = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotX)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotZ)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownCentroidZ)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownCentroidX)).BeginInit();
             this.SuspendLayout();
             // 
             // glControl1
@@ -108,7 +113,7 @@ namespace OpenTKCalculator
             // 
             this.hScrollScale.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.hScrollScale.LargeChange = 1;
-            this.hScrollScale.Location = new System.Drawing.Point(19, 520);
+            this.hScrollScale.Location = new System.Drawing.Point(3, 543);
             this.hScrollScale.Minimum = 10;
             this.hScrollScale.Name = "hScrollScale";
             this.hScrollScale.Size = new System.Drawing.Size(311, 26);
@@ -125,7 +130,7 @@ namespace OpenTKCalculator
             0,
             0,
             131072});
-            this.numericUpDownRotX.Location = new System.Drawing.Point(56, 570);
+            this.numericUpDownRotX.Location = new System.Drawing.Point(35, 619);
             this.numericUpDownRotX.Maximum = new decimal(new int[] {
             1253305502,
             146,
@@ -134,100 +139,146 @@ namespace OpenTKCalculator
             this.numericUpDownRotX.Name = "numericUpDownRotX";
             this.numericUpDownRotX.Size = new System.Drawing.Size(55, 27);
             this.numericUpDownRotX.TabIndex = 6;
+            this.numericUpDownRotX.ValueChanged += new System.EventHandler(this.numericUpDownRotX_ValueChanged);
+            this.numericUpDownRotX.DragOver += new System.Windows.Forms.DragEventHandler(this.numericUpDownRotX_DragOver);
             // 
             // label3
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(27, 546);
+            this.label3.Location = new System.Drawing.Point(0, 585);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(79, 20);
+            this.label3.Size = new System.Drawing.Size(128, 20);
             this.label3.TabIndex = 9;
-            this.label3.Text = "Euler(x,y,z)";
+            this.label3.Text = "Euler Angles(x,y,z)";
             // 
-            // vScrollBar1
+            // numericUpDownRotY
             // 
-            this.vScrollBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.vScrollBar1.LargeChange = 1;
-            this.vScrollBar1.Location = new System.Drawing.Point(27, 570);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(26, 79);
-            this.vScrollBar1.TabIndex = 10;
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown1.DecimalPlaces = 2;
-            this.numericUpDown1.Increment = new decimal(new int[] {
+            this.numericUpDownRotY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.numericUpDownRotY.DecimalPlaces = 2;
+            this.numericUpDownRotY.Increment = new decimal(new int[] {
             5,
             0,
             0,
             131072});
-            this.numericUpDown1.Location = new System.Drawing.Point(143, 568);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.numericUpDownRotY.Location = new System.Drawing.Point(138, 619);
+            this.numericUpDownRotY.Maximum = new decimal(new int[] {
             1253305502,
             146,
             0,
             720896});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(55, 27);
-            this.numericUpDown1.TabIndex = 11;
+            this.numericUpDownRotY.Name = "numericUpDownRotY";
+            this.numericUpDownRotY.Size = new System.Drawing.Size(55, 27);
+            this.numericUpDownRotY.TabIndex = 11;
+            this.numericUpDownRotY.ValueChanged += new System.EventHandler(this.numericUpDownRotY_ValueChanged);
             // 
-            // numericUpDown2
+            // numericUpDownRotZ
             // 
-            this.numericUpDown2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown2.DecimalPlaces = 2;
-            this.numericUpDown2.Increment = new decimal(new int[] {
+            this.numericUpDownRotZ.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.numericUpDownRotZ.DecimalPlaces = 2;
+            this.numericUpDownRotZ.Increment = new decimal(new int[] {
             5,
             0,
             0,
             131072});
-            this.numericUpDown2.Location = new System.Drawing.Point(230, 568);
-            this.numericUpDown2.Maximum = new decimal(new int[] {
+            this.numericUpDownRotZ.Location = new System.Drawing.Point(237, 619);
+            this.numericUpDownRotZ.Maximum = new decimal(new int[] {
             1253305502,
             146,
             0,
             720896});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(55, 27);
-            this.numericUpDown2.TabIndex = 12;
-            // 
-            // vScrollBar2
-            // 
-            this.vScrollBar2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.vScrollBar2.LargeChange = 1;
-            this.vScrollBar2.Location = new System.Drawing.Point(114, 568);
-            this.vScrollBar2.Name = "vScrollBar2";
-            this.vScrollBar2.Size = new System.Drawing.Size(26, 79);
-            this.vScrollBar2.TabIndex = 13;
-            // 
-            // vScrollBar3
-            // 
-            this.vScrollBar3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.vScrollBar3.LargeChange = 1;
-            this.vScrollBar3.Location = new System.Drawing.Point(201, 568);
-            this.vScrollBar3.Name = "vScrollBar3";
-            this.vScrollBar3.Size = new System.Drawing.Size(26, 79);
-            this.vScrollBar3.TabIndex = 14;
+            this.numericUpDownRotZ.Name = "numericUpDownRotZ";
+            this.numericUpDownRotZ.Size = new System.Drawing.Size(55, 27);
+            this.numericUpDownRotZ.TabIndex = 12;
+            this.numericUpDownRotZ.ValueChanged += new System.EventHandler(this.numericUpDownRotZ_ValueChanged);
             // 
             // panel1
             // 
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.buttonResetCamera);
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Controls.Add(this.buttonEvaluate);
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.numericUpDownCentroidZ);
+            this.panel1.Controls.Add(this.numericUpDownCentroidX);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.hScrollScale);
-            this.panel1.Controls.Add(this.numericUpDown2);
-            this.panel1.Controls.Add(this.vScrollBar3);
+            this.panel1.Controls.Add(this.numericUpDownRotZ);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.expressionTextBox);
-            this.panel1.Controls.Add(this.vScrollBar1);
-            this.panel1.Controls.Add(this.vScrollBar2);
-            this.panel1.Controls.Add(this.numericUpDown1);
+            this.panel1.Controls.Add(this.numericUpDownRotY);
             this.panel1.Controls.Add(this.numericUpDownRotX);
             this.panel1.Location = new System.Drawing.Point(922, 12);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(330, 649);
             this.panel1.TabIndex = 15;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(4, 509);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(44, 20);
+            this.label5.TabIndex = 17;
+            this.label5.Text = "Scale";
+            // 
+            // buttonEvaluate
+            // 
+            this.buttonEvaluate.BackColor = System.Drawing.SystemColors.WindowFrame;
+            this.buttonEvaluate.Location = new System.Drawing.Point(11, 152);
+            this.buttonEvaluate.Name = "buttonEvaluate";
+            this.buttonEvaluate.Size = new System.Drawing.Size(306, 29);
+            this.buttonEvaluate.TabIndex = 16;
+            this.buttonEvaluate.Text = "Evaluate";
+            this.buttonEvaluate.UseVisualStyleBackColor = false;
+            this.buttonEvaluate.Click += new System.EventHandler(this.buttonEvaluate_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 65);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(97, 20);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Centroid(x, z)";
+            // 
+            // numericUpDownCentroidZ
+            // 
+            this.numericUpDownCentroidZ.DecimalPlaces = 3;
+            this.numericUpDownCentroidZ.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.numericUpDownCentroidZ.Location = new System.Drawing.Point(192, 99);
+            this.numericUpDownCentroidZ.Name = "numericUpDownCentroidZ";
+            this.numericUpDownCentroidZ.Size = new System.Drawing.Size(100, 27);
+            this.numericUpDownCentroidZ.TabIndex = 14;
+            // 
+            // numericUpDownCentroidX
+            // 
+            this.numericUpDownCentroidX.DecimalPlaces = 3;
+            this.numericUpDownCentroidX.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.numericUpDownCentroidX.Location = new System.Drawing.Point(35, 99);
+            this.numericUpDownCentroidX.Name = "numericUpDownCentroidX";
+            this.numericUpDownCentroidX.Size = new System.Drawing.Size(100, 27);
+            this.numericUpDownCentroidX.TabIndex = 13;
+            // 
+            // buttonResetCamera
+            // 
+            this.buttonResetCamera.BackColor = System.Drawing.SystemColors.WindowFrame;
+            this.buttonResetCamera.Location = new System.Drawing.Point(3, 471);
+            this.buttonResetCamera.Name = "buttonResetCamera";
+            this.buttonResetCamera.Size = new System.Drawing.Size(324, 29);
+            this.buttonResetCamera.TabIndex = 18;
+            this.buttonResetCamera.Text = "Reset Camera";
+            this.buttonResetCamera.UseVisualStyleBackColor = false;
+            this.buttonResetCamera.Click += new System.EventHandler(this.buttonResetCamera_Click);
             // 
             // MainForm
             // 
@@ -244,10 +295,12 @@ namespace OpenTKCalculator
             this.Name = "MainForm";
             this.Text = "3D Calculator";
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotX)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotZ)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownCentroidZ)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownCentroidX)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -263,12 +316,15 @@ namespace OpenTKCalculator
         private System.Windows.Forms.HScrollBar hScrollScale;
         private System.Windows.Forms.NumericUpDown numericUpDownRotX;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.VScrollBar vScrollBar1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
-        private System.Windows.Forms.VScrollBar vScrollBar2;
-        private System.Windows.Forms.VScrollBar vScrollBar3;
+        private System.Windows.Forms.NumericUpDown numericUpDownRotY;
+        private System.Windows.Forms.NumericUpDown numericUpDownRotZ;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button buttonEvaluate;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.NumericUpDown numericUpDownCentroidZ;
+        private System.Windows.Forms.NumericUpDown numericUpDownCentroidX;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button buttonResetCamera;
     }
 }
 

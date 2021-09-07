@@ -23,11 +23,9 @@ namespace OpenTKCalculator
         //CalculationMesh[] dynMeshes;
         CalculationGrid grid;
         Mutex evaluationMutex;
-        bool rotxPressed = false;
-        bool rotYPressed = false;
-        bool rotZPressed = false;
-        bool appRunning = false;
         Stopwatch stopwatch;
+        private bool appRunning;
+
         public MainForm()
         {
             InitializeComponent();
@@ -38,7 +36,7 @@ namespace OpenTKCalculator
         {
             base.OnLoad(e);
 
-            
+
             appRunning = true;
             Renderer.instance = new Renderer();
             interpreter = new Interpreter();
@@ -46,37 +44,15 @@ namespace OpenTKCalculator
             evaluationMutex = new Mutex();
             stopwatch = new Stopwatch();
             Renderer.instance.Initialize(glControl1);
-
-
-            List<float> gridVerts = new List<float>();
-            int gridSize = 50;
-            for(int i = -gridSize; i<= gridSize; i++)
-            {
-                gridVerts.Add(i);
-                gridVerts.Add(0);
-                gridVerts.Add(-gridSize);
-
-                gridVerts.Add(i);
-                gridVerts.Add(0);
-                gridVerts.Add(gridSize);
-
-                gridVerts.Add(-gridSize);
-                gridVerts.Add(0);
-                gridVerts.Add(i);
-
-                gridVerts.Add(gridSize);
-                gridVerts.Add(0);
-                gridVerts.Add(i);
-            }
-
-            //dynMeshes = CalculationMesh.GenerateCalculationMeshGrid(10, -20, -20, 20, 20);
-            //for (int i = 0; i < dynMeshes.Length; i++)
-            //{
-            //    renderer.AddCalculationMesh(dynMeshes[i]);
-            //}
-            grid = new CalculationGrid(10, -10, -10, 10, 10);
+            grid = CalculationGrid.GenerateCalculationGrid(BufferUsageHint.DynamicDraw, -5, -5, 5, 5);
             listBox1.Items.Add(grid);
 
+            numericUpDownRotX.Scroll += NumericUpDownRotX_Scroll;
+        }
+
+        private void NumericUpDownRotX_Scroll(object sender, ScrollEventArgs e)
+        {
+            Console.WriteLine("Hello");
         }
 
         private void GlControl1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -90,11 +66,11 @@ namespace OpenTKCalculator
             base.OnClosing(e);
             Renderer.instance.Dispose();
         }
-        
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             Input.keyboardInput = Keyboard.GetState();
-           
+
 
             if (Input.keyboardInput.IsKeyDown(Key.Escape))
             {
@@ -148,50 +124,63 @@ namespace OpenTKCalculator
 
         private async void expressionTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
             {
-                evaluationMutex.WaitOne();
-                try
-                {
-                    tokenizer.TokenizeExpression(expressionTextBox.Text);
-                    //try to interpret the expression to ensure no errors a had
-                    interpreter.EvaluateExpression(tokenizer.Tokens);
-                    grid.UpdateExpression(expressionTextBox.Text, tokenizer.Tokens, interpreter);
-                    listBox1.SelectedItem = grid;
-                }
-                catch(Exception exception)
-                {
-                    Console.WriteLine(exception.Message);
-                }
-                evaluationMutex.ReleaseMutex();
+                buttonEvaluate_Click(sender, e);
             }
         }
 
         private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
         {
-            float s =10.0f*(float)(hScrollScale.Value ) / hScrollScale.Maximum;
+            float s = 10.0f * (float)(hScrollScale.Value) / hScrollScale.Maximum;
             grid.parent.Scale = new Vector3(s, s, s);
             this.Invalidate();
         }
 
-        private void vScrollRotX_Scroll(object sender, ScrollEventArgs e)
+        private void numericUpDownRotX_ValueChanged(object sender, EventArgs e)
         {
-            //float theta = (float)Math.PI * 2.0f * vScrollRotX.Value / vScrollRotX.Maximum;
-            //grid.parent.Euler = new Vector3(theta, grid.parent.Euler.Y, grid.parent.Euler.Z);
+            grid.parent.Euler = new Vector3((float)numericUpDownRotX.Value, grid.parent.Euler.Y, grid.parent.Euler.Z);
         }
 
-        private void vScrollRotY_Scroll(object sender, ScrollEventArgs e)
+        private void numericUpDownRotY_ValueChanged(object sender, EventArgs e)
         {
-            //float theta = (float)Math.PI * 2.0f * vScrollRotY.Value / vScrollRotY.Maximum;
-           // grid.parent.Euler = new Vector3(grid.parent.Euler.X, theta, grid.parent.Euler.Z);
+            grid.parent.Euler = new Vector3(grid.parent.Euler.X, (float)numericUpDownRotY.Value, grid.parent.Euler.Z);
         }
 
-        private void vScrollRotZ_Scroll(object sender, ScrollEventArgs e)
+        private void numericUpDownRotZ_ValueChanged(object sender, EventArgs e)
         {
-           // float theta = (float)Math.PI * 2.0f * vScrollRotZ.Value / vScrollRotZ.Maximum;
-           // grid.parent.Euler = new Vector3(grid.parent.Euler.X, grid.parent.Euler.Y, theta);
+            grid.parent.Euler = new Vector3(grid.parent.Euler.X, grid.parent.Euler.Y, (float)numericUpDownRotZ.Value);
         }
 
+        private void numericUpDownRotX_DragOver(object sender, DragEventArgs e)
+        {
+            Console.WriteLine("drag");
+        }
 
+        private async void buttonEvaluate_Click(object sender, EventArgs e)
+        {
+            evaluationMutex.WaitOne();
+            try
+            {
+                tokenizer.TokenizeExpression(expressionTextBox.Text);
+                //try to interpret the expression to ensure no errors a had
+                interpreter.EvaluateExpression(tokenizer.Tokens);
+                grid.UpdateExpression(expressionTextBox.Text, tokenizer.Tokens, interpreter, (double)numericUpDownCentroidX.Value, (double)numericUpDownCentroidZ.Value);
+                listBox1.SelectedItem = grid;
+                Camera.instance.Position = new Vector3(Camera.instance.Position.X, grid.GetCentroidPosition().Y, Camera.instance.Position.Z);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+            evaluationMutex.ReleaseMutex();
+        }
+
+        private void buttonResetCamera_Click(object sender, EventArgs e)
+        {
+            Camera.instance.Position = new Vector3(0, 2, 5);
+            Camera.instance.Yaw = 0.0f;
+            Camera.instance.Pitch = 0.0f;
+        }
     }
 }

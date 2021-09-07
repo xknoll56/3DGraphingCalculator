@@ -30,7 +30,7 @@ namespace OpenTKCalculator
 
         public Token(char c)
         {
-            if (Char.ToUpper(c) == 'X' || Char.ToUpper(c) == 'Y')
+            if (Char.ToUpper(c) == 'X' || Char.ToUpper(c) == 'Y' || Char.ToUpper(c) == 'T')
             {
                 type = TokenType.VARIABLE;
                 this.var = Char.ToUpper(c);
@@ -140,7 +140,7 @@ namespace OpenTKCalculator
                         }
                         else if (Char.IsLetter(c))
                         {
-                            if (Char.ToUpper(c) == 'X' || Char.ToUpper(c) == 'Y')
+                            if (Char.ToUpper(c) == 'X' || Char.ToUpper(c) == 'Y' || Char.ToUpper(c) == 'T')
                                 tokens.Add(new Token(c));
                             else
                             {

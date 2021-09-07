@@ -89,14 +89,42 @@ namespace OpenTKCalculator
             }
         }
 
+        private void ReplaceAllVariables(List<Token> tokens, double x, double y, double t)
+        {
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (tokens[i].type == TokenType.VARIABLE)
+                {
+                    if (Char.ToUpper(tokens[i].GetData<char>()) == 'X')
+                        tokens[i] = new Token(x);
+                    else if (Char.ToUpper(tokens[i].GetData<char>()) == 'Y')
+                        tokens[i] = new Token(y);
+                    else if (Char.ToUpper(tokens[i].GetData<char>()) == 'T')
+                        tokens[i] = new Token(t);
+                }
+            }
+        }
+
         public float EvaluateExpression(List<Token> tokens)
         {
-            return EvaluateExpression(tokens, 0, 0);
+            return EvaluateExpression(tokens, 0, 0, 0);
         }
 
         public float EvaluateExpression(List<Token> tokens, double x, double y)
         {
             ReplaceAllVariables(tokens, x, y);
+
+            if (tokens.FindAll(new Predicate<Token>(FindOpenBrackets)).Count != tokens.FindAll(new Predicate<Token>(FindClosedBrackets)).Count)
+            {
+                throw new Exception("Invalid bracketing");
+            }
+            return (float)EvaluateExpressionRecursive(tokens.ToArray());
+
+        }
+
+        public float EvaluateExpression(List<Token> tokens, double x, double y, double t)
+        {
+            ReplaceAllVariables(tokens, x, y, t);
 
             if (tokens.FindAll(new Predicate<Token>(FindOpenBrackets)).Count != tokens.FindAll(new Predicate<Token>(FindClosedBrackets)).Count)
             {

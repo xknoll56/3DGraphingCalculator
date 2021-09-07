@@ -18,7 +18,6 @@ namespace OpenTKCalculator
         private Stopwatch stopwatch;
         private Shader shader;
         private Shader gridShader;
-        private Camera mainCamera;
         private List<CalculationMesh> calculationMeshes;
         private List<Mesh> meshes;
         private List<Entity> parentEntities;
@@ -52,12 +51,12 @@ namespace OpenTKCalculator
             shader = new Shader("Shaders/ModelShader.vert", "Shaders/ModelShader.frag");
             gridShader = new Shader("Shaders/GridShader.vert", "Shaders/GridShader.frag");
 
-            mainCamera = new Camera(new Vector3(0, 2, 5), glControl.AspectRatio);
+            Camera.instance = new Camera(new Vector3(0, 2, 5), glControl.AspectRatio);
             //mainCamera.Yaw = 0.23f;
             Matrix4 model = Matrix4.Identity;
             shader.SetMatrix4("model", model);
-            shader.SetMatrix4("view", mainCamera.GetViewMatrix());
-            shader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
+            shader.SetMatrix4("view", Camera.instance.GetViewMatrix());
+            shader.SetMatrix4("projection", Camera.instance.GetProjectionMatrix());
             gridShader.SetMatrix4("model", Matrix4.Identity);
 
             stopwatch = new Stopwatch();
@@ -69,7 +68,6 @@ namespace OpenTKCalculator
 
             return true;
         }
-
 
 
         private void OnResize(object? sender, EventArgs e)
@@ -91,6 +89,11 @@ namespace OpenTKCalculator
             */
         }
 
+        public void Repaint()
+        {
+            glControl.Invalidate();
+        }
+
         private void OnPaint(object? sender, PaintEventArgs e)
         {
             //input = Keyboard.GetState();
@@ -104,35 +107,35 @@ namespace OpenTKCalculator
 
                 if (Input.keys[(int)Keys.A])
                 {
-                    mainCamera.Position -= mainCamera.Right * dt * 10.0f;
+                    Camera.instance.Position -= Camera.instance.Right * dt * 10.0f;
                 }
                 if (Input.keys[(int)Keys.D])
                 {
-                    mainCamera.Position += mainCamera.Right * dt * 10.0f;
+                    Camera.instance.Position += Camera.instance.Right * dt * 10.0f;
                 }
                 if (Input.keys[(int)Keys.W])
                 {
-                    mainCamera.Position += mainCamera.Front * dt * 10.0f;
+                    Camera.instance.Position += Camera.instance.Front * dt * 10.0f;
                 }
                 if (Input.keys[(int)Keys.S])
                 {
-                    mainCamera.Position -= mainCamera.Front * dt * 10.0f;
+                    Camera.instance.Position -= Camera.instance.Front * dt * 10.0f;
                 }
                 if (Input.mouse[0])
                 {
                     float dx = (Input.mouseInput.X - Input.prevMousePos.X);
                     float dy = (Input.mouseInput.Y - Input.prevMousePos.Y);
-                    mainCamera.Yaw += dx * dt * 5.0f;
-                    mainCamera.Pitch -= dy * dt * 5.0f;
+                    Camera.instance.Yaw += dx * dt * 5.0f;
+                    Camera.instance.Pitch -= dy * dt * 5.0f;
                     Input.prevMousePos.X = Input.mouseInput.X;
                     Input.prevMousePos.Y = Input.mouseInput.Y;
 
                 }
             }
-            shader.SetMatrix4("view", mainCamera.GetViewMatrix());
-            shader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
-            gridShader.SetMatrix4("view", mainCamera.GetViewMatrix());
-            gridShader.SetMatrix4("projection", mainCamera.GetProjectionMatrix());
+            shader.SetMatrix4("view", Camera.instance.GetViewMatrix());
+            shader.SetMatrix4("projection", Camera.instance.GetProjectionMatrix());
+            gridShader.SetMatrix4("view", Camera.instance.GetViewMatrix());
+            gridShader.SetMatrix4("projection", Camera.instance.GetProjectionMatrix());
             IGraphicsContext graphicsContext = GraphicsContext.CurrentContext;
             if (graphicsContext == null || !graphicsContext.IsCurrent)
                 glControl.MakeCurrent();    // Tell OpenGL to draw on MyGLControl.
